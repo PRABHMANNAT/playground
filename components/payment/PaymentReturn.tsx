@@ -6,8 +6,8 @@ import { useSearchParams } from "next/navigation";
 
 import {
   activateCampaignAfterVerification,
+  attachPinchPayment,
   getCampaign,
-  setCampaignStatus,
 } from "@/lib/campaign/store";
 import type { PinchApiErrorBody, VerifyPaymentResult } from "@/lib/pinch/types";
 
@@ -55,7 +55,11 @@ export function PaymentReturn() {
     setMessage(null);
 
     try {
-      const query = new URLSearchParams({ paymentId, paymentLinkId });
+      const query = new URLSearchParams({
+        paymentId,
+        paymentLinkId,
+        campaignId,
+      });
       const response = await fetch(`/api/pinch/verify-payment?${query}`);
       const payload = (await response.json()) as
         | VerifyPaymentResult
@@ -83,6 +87,12 @@ export function PaymentReturn() {
         return;
       }
 
+      await attachPinchPayment(campaignId, {
+        paymentId: payload.paymentId,
+        paymentLinkId: payload.paymentLinkId,
+        paymentStatus: payload.status,
+      });
+
       // Activation goes through the guard, which refuses anything that is not
       // server-verified. Query parameters alone never activate a campaign.
       const activation = await activateCampaignAfterVerification(campaignId, {
@@ -98,8 +108,6 @@ export function PaymentReturn() {
         return;
       }
 
-      // funded, then live.
-      await setCampaignStatus(campaignId, "live");
       const campaign = await getCampaign(campaignId);
       setCampaignStatusLabel(campaign?.status ?? "live");
       setState("success");

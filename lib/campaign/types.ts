@@ -64,33 +64,63 @@ export type CampaignFormField = keyof CampaignFormValues;
 
 export type CampaignFormErrors = Partial<Record<CampaignFormField, string>>;
 
-/**
- * What Playground keeps about the Pinch side of a campaign. Deliberately
- * narrow: identifiers and the hosted URL only. No credentials, no tokens, and
- * no payment instrument details are ever stored client-side.
- */
-export interface CampaignPinchState {
-  environment: "sandbox";
-  payerId: string | null;
-  paymentLinkId: string | null;
-  hostedUrl: string | null;
-  requestedAt: number | null;
-}
-
 export interface Campaign {
   id: string;
-  status: CampaignStatus;
+  companyName: string;
   founderName: string;
   founderEmail: string;
-  companyName: string;
   productUrl: string;
   validationQuestion: string;
   audience: CampaignAudience;
-  packageId: CampaignPackageId;
-  pricing: CampaignPricing;
-  pinch: CampaignPinchState;
+  packageName: string;
+  amount: number;
+  currency: "AUD";
+  status: CampaignStatus;
+  pinchPayerId: string | null;
+  pinchPaymentLinkId: string | null;
+  pinchPaymentId: string | null;
+  paymentStatus: string | null;
   createdAt: number;
-  updatedAt: number;
+  fundedAt: number | null;
+  activatedAt: number | null;
+}
+
+export type CampaignEvidenceKind =
+  | "confusion"
+  | "blocker"
+  | "recommendation"
+  | "screenshot"
+  | "loom";
+
+export type CampaignVerdict =
+  | "ready"
+  | "modification"
+  | "blocker"
+  | "insufficient";
+
+export type SubmissionSourceType = "live_demo" | "seeded_demo";
+
+export type RewardStatus =
+  | "reserved"
+  | "manual_review"
+  | "approved"
+  | "paid";
+
+export interface TesterSubmission {
+  id: string;
+  campaignId: string;
+  testerName: string;
+  issue: string;
+  severity: "Low" | "Medium" | "High";
+  expectedBehaviour: string;
+  recommendation: string;
+  loomUrl: string;
+  finalVerdict: CampaignVerdict;
+  sourceType: SubmissionSourceType;
+  qualityStatus: "Quality review pending" | "Quality approved";
+  rewardAmount: number;
+  rewardStatus: RewardStatus;
+  submittedAt: number;
 }
 
 // Checkout request/response types live with the Pinch service in
