@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Playground Tester",
+  "version": "0.1.0",
+  "description": "Run guided Playground tests on the real product URL.",
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "host_permissions": [
+    "https://ingen-hrandstudent-5.vercel.app/*",
+    "https://playground-tester-workspace.vercel.app/*",
+    "http://localhost:3000/*",
+    "http://localhost:3100/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://playground-tester-workspace.vercel.app/*",
+        "http://localhost:3000/*",
+        "http://localhost:3100/*"
+      ],
+      "js": ["playground-bridge.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://ingen-hrandstudent-5.vercel.app/*"],
+      "js": ["product-overlay.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Playground Tester"
+  }
+}
