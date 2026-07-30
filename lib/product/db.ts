@@ -2,7 +2,10 @@
 
 import Dexie, { type EntityTable } from "dexie";
 
-import type { Campaign } from "@/lib/campaign/types";
+import type {
+  Campaign,
+  TesterSubmission,
+} from "@/lib/campaign/types";
 import {
   DEMO_PROJECTS,
   DEMO_REVIEWER,
@@ -65,6 +68,7 @@ export class PlaygroundDatabase extends Dexie {
   fixPreviews!: EntityTable<FixPreview, "id">;
   founderFindings!: EntityTable<FounderFinding, "id">;
   campaigns!: EntityTable<Campaign, "id">;
+  campaignSubmissions!: EntityTable<TesterSubmission, "id">;
 
   constructor() {
     super("playground-tester");
@@ -90,6 +94,13 @@ export class PlaygroundDatabase extends Dexie {
     // new table and leaves every version 1 table untouched.
     this.version(2).stores({
       campaigns: "id, status, createdAt",
+    });
+    this.version(3).stores({
+      campaignSubmissions: "id, campaignId, qualityStatus, submittedAt",
+    });
+    this.version(4).stores({
+      campaignSubmissions:
+        "id, campaignId, sourceType, qualityStatus, rewardStatus, submittedAt",
     });
   }
 }

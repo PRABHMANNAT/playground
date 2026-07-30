@@ -11,9 +11,9 @@ import {
 } from "@/lib/campaign/package";
 import { validateCampaignForm } from "@/lib/campaign/schema";
 import {
-  createDraftCampaign,
-  recordPinchCheckout,
-  setCampaignStatus,
+  attachPinchPayment,
+  createCampaign,
+  updateCampaignStatus,
 } from "@/lib/campaign/store";
 import type {
   CampaignFormErrors,
@@ -93,12 +93,12 @@ export function CampaignForm() {
 
     try {
       if (!campaignIdRef.current) {
-        const draft = await createDraftCampaign(validation.values);
+        const draft = await createCampaign(validation.values);
         campaignIdRef.current = draft.id;
       }
       const campaignId = campaignIdRef.current;
 
-      await setCampaignStatus(campaignId, "payment_pending");
+      await updateCampaignStatus(campaignId, "payment_pending");
 
       const response = await fetch("/api/pinch/create-checkout", {
         method: "POST",
@@ -121,16 +121,15 @@ export function CampaignForm() {
             ? payload.error.message
             : "Playground could not start the Pinch checkout.";
         // Return the campaign to draft so a retry starts from a clean state.
-        await setCampaignStatus(campaignId, "draft");
+        await updateCampaignStatus(campaignId, "draft");
         setFailure(message);
         setState("error");
         return;
       }
 
-      await recordPinchCheckout(campaignId, {
+      await attachPinchPayment(campaignId, {
         payerId: payload.payerId,
         paymentLinkId: payload.paymentLinkId,
-        hostedUrl: payload.checkoutUrl,
       });
 
       if (payload.mock) {
@@ -145,7 +144,7 @@ export function CampaignForm() {
     } catch (error) {
       console.error("Checkout could not be started", error);
       if (campaignIdRef.current) {
-        await setCampaignStatus(campaignIdRef.current, "draft");
+        await updateCampaignStatus(campaignIdRef.current, "draft");
       }
       setFailure(
         "Playground could not reach the checkout service. Check your connection and try again.",

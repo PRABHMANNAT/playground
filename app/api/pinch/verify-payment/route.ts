@@ -22,6 +22,7 @@ const identifier = (label: string) =>
 const querySchema = z.object({
   paymentId: identifier("paymentId"),
   paymentLinkId: identifier("paymentLinkId"),
+  campaignId: identifier("campaignId"),
 });
 
 function errorResponse(
@@ -45,6 +46,7 @@ export async function GET(
   const parsed = querySchema.safeParse({
     paymentId: url.searchParams.get("paymentId") ?? "",
     paymentLinkId: url.searchParams.get("paymentLinkId") ?? "",
+    campaignId: url.searchParams.get("campaignId") ?? "",
   });
 
   if (!parsed.success) {
@@ -52,7 +54,7 @@ export async function GET(
       400,
       "invalid_request",
       parsed.error.issues[0]?.message ??
-        "paymentId and paymentLinkId are required.",
+        "paymentId, paymentLinkId and campaignId are required.",
     );
   }
 
@@ -60,6 +62,7 @@ export async function GET(
     const result = await verifyPayment(
       parsed.data.paymentId,
       parsed.data.paymentLinkId,
+      parsed.data.campaignId,
     );
     return NextResponse.json(result);
   } catch (error) {

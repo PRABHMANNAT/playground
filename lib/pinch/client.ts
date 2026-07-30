@@ -1,5 +1,6 @@
 import "server-only";
 
+import { CAMPAIGN_PRICING } from "@/lib/campaign/package";
 import {
   PinchError,
   isFundedStatus,
@@ -215,6 +216,36 @@ function shapeOf(records: Record<string, unknown>[]): string[][] {
   return records.map((record) => Object.keys(record));
 }
 
+function readMetadataCampaignId(
+  records: Record<string, unknown>[],
+): string | null {
+  for (const record of records) {
+    const metadata = record.metadata;
+    if (metadata && typeof metadata === "object" && !Array.isArray(metadata)) {
+      const campaignId = (metadata as Record<string, unknown>).campaignId;
+      if (typeof campaignId === "string" && campaignId.trim()) {
+        return campaignId.trim();
+      }
+    }
+    if (typeof metadata !== "string" || !metadata.trim()) {
+      continue;
+    }
+    try {
+      const parsed = JSON.parse(metadata) as unknown;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        const campaignId = (parsed as Record<string, unknown>).campaignId;
+        if (typeof campaignId === "string" && campaignId.trim()) {
+          return campaignId.trim();
+        }
+      }
+    } catch {
+      // Metadata is free text. Playground writes JSON, so any other value
+      // cannot authoritatively bind the payment to this campaign.
+    }
+  }
+  return null;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Authentication                                                             */
 /* -------------------------------------------------------------------------- */
@@ -275,6 +306,7 @@ function authorisedHeaders(token: string): HeadersInit {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
     Accept: "application/json",
+    "pinch-version": "2020.1",
   };
 }
 
@@ -465,6 +497,7 @@ export async function createCheckout(
 export async function verifyPayment(
   paymentId: string,
   paymentLinkId: string,
+  campaignId: string,
 ): Promise<VerifyPaymentResult> {
   const config = readPinchConfig();
 
@@ -483,22 +516,35 @@ export async function verifyPayment(
 
   const token = await getAccessToken(config);
 
-  const payload = await requestJson(
-    `${config.apiBaseUrl}/payments/${encodeURIComponent(paymentId)}`,
-    { method: "GET", headers: authorisedHeaders(token) },
-    {
-      code: "pinch_payment_lookup_failed",
-      message:
-        "Pinch could not return this payment. It may still be processing — try again in a moment.",
-    },
-    { step: "payments.get" },
-  );
+  const [paymentPayload, paymentLinkPayload] = await Promise.all([
+    requestJson(
+      `${config.apiBaseUrl}/payments/${encodeURIComponent(paymentId)}`,
+      { method: "GET", headers: authorisedHeaders(token) },
+      {
+        code: "pinch_payment_lookup_failed",
+        message:
+          "Pinch could not return this payment. It may still be processing — try again in a moment.",
+      },
+      { step: "payments.get" },
+    ),
+    requestJson(
+      `${config.apiBaseUrl}/payment-links/${encodeURIComponent(paymentLinkId)}`,
+      { method: "GET", headers: authorisedHeaders(token) },
+      {
+        code: "pinch_payment_lookup_failed",
+        message:
+          "Pinch could not verify the Payment Link for this campaign. Try again in a moment.",
+      },
+      { step: "payment-links.get", campaignId },
+    ),
+  ]);
 
-  const record = candidates(payload);
-  const status = readString(record, ["status"]);
+  const paymentRecords = candidates(paymentPayload);
+  const paymentLinkRecords = candidates(paymentLinkPayload);
+  const status = readString(paymentRecords, ["status"]);
 
   if (!status) {
-    logFailure("payment response missing status", shapeOf(record));
+    logFailure("payment response missing status", shapeOf(paymentRecords));
     throw new PinchError(
       "pinch_unexpected_response",
       "Pinch did not return a payment status. Try again in a moment.",
@@ -507,8 +553,32 @@ export async function verifyPayment(
 
   // Pinch names this `amount` on the payment object but `amountInCents` on the
   // payment link. Both are minor units; accept either.
-  const amountInCents = readNumber(record, ["amount", "amountInCents"]);
-  const verified = isFundedStatus(status);
+  const amountInCents = readNumber(paymentRecords, ["amount", "amountInCents"]);
+  const linkAmountInCents = readNumber(paymentLinkRecords, [
+    "amount",
+    "amountInCents",
+  ]);
+  const returnedPaymentLinkId = readString(paymentRecords, ["paymentLinkId"]);
+  const linkMatches =
+    returnedPaymentLinkId === null || returnedPaymentLinkId === paymentLinkId;
+  const paymentPayerId = readString(paymentRecords, ["payerId"]);
+  const paymentLinkPayerId = readString(paymentLinkRecords, ["payerId"]);
+  const payerMatches =
+    paymentPayerId !== null &&
+    paymentLinkPayerId !== null &&
+    paymentPayerId === paymentLinkPayerId;
+  const expectedAmount = CAMPAIGN_PRICING.campaignFunding * 100;
+  const amountMatches =
+    amountInCents === expectedAmount && linkAmountInCents === expectedAmount;
+  const metadataMatches =
+    readMetadataCampaignId(paymentRecords) === campaignId &&
+    readMetadataCampaignId(paymentLinkRecords) === campaignId;
+  const verified =
+    isFundedStatus(status) &&
+    linkMatches &&
+    payerMatches &&
+    amountMatches &&
+    metadataMatches;
 
   logStep("verify.result", { paymentId, paymentLinkId, status: undefined });
   logStep(`verify.status=${status} verified=${verified}`, { paymentId });

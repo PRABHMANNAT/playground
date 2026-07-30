@@ -201,7 +201,7 @@ function EmptyBrowserState({
   );
 }
 
-function BrowserLoadingState({ message }: { message: string }) {
+export function BrowserLoadingState({ message }: { message: string }) {
   return (
     <div aria-live="polite" className="browser-state browser-loading">
       <div aria-hidden="true" className="loading-frame">
@@ -227,7 +227,7 @@ function BrowserErrorState({ message }: { message: string }) {
   );
 }
 
-function RemoteBrowserView({
+export function RemoteBrowserView({
   session,
   onDisconnect,
 }: {
