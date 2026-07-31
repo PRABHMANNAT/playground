@@ -311,8 +311,7 @@
 }
 
 .landing-api-hero__frame {
-  /* Hero artwork. Swap this one line to change the background image —
-     nothing else in the hero references it. */
+  /* The supplied artwork is the complete hero backdrop. */
   --api-hero-image: url("/landing-hero-bg.png");
 
   position: relative;
@@ -323,9 +322,7 @@
   align-items: center;
   gap: 34px;
   overflow: hidden;
-  border: 1px solid #b9c9df;
-  /* Sky tone behind the artwork, so the hero still reads as intentional
-     while the image loads or if it is missing. */
+  border: 0;
   background: var(--api-hero-image) center bottom / cover no-repeat, #bcd2ea;
 }
 
@@ -438,20 +435,8 @@
   line-height: 0;
 }
 
-/* Keeps the left-hand copy readable over the artwork. */
 .landing-api-hero__frame::before {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(247, 251, 255, 0.9) 0%,
-      rgba(247, 251, 255, 0.62) 34%,
-      rgba(247, 251, 255, 0) 62%
-    );
-  content: "";
-  pointer-events: none;
+  display: none;
 }
 
 .landing-api-hero .landing-preview {
@@ -479,11 +464,10 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  /* The inner block is 100svh and sticks; the remainder is the scroll
-     distance the reveal animates over. 125svh leaves enough travel for the
-     reveal without the long empty gap 175svh created. */
-  height: 125svh;
-  min-height: 860px;
+  /* A short scroll runway reveals the Australia scene without leaving a
+     second empty viewport between it and the workflow rail. */
+  height: 108svh;
+  min-height: 760px;
   background: #0c0504;
   color: #fff;
 }
@@ -1069,7 +1053,7 @@
 /* Workflow */
 
 .landing-flow {
-  --flow-lift: -180px;
+  --flow-lift: -120px;
 
   position: relative;
   z-index: 3;

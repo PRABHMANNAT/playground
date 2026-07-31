@@ -20,7 +20,7 @@ test("Landing hero scrolls from the local sunset into the Australia ASCII scene"
   assert.match(landing, /src="\/playground-logo\.png"/);
   assert.match(landing, /Powered by/);
   assert.match(landing, /PinchPayments/);
-  assert.match(landing, /For founding users/);
+  assert.match(landing, /For testers/);
   assert.match(landing, /landing-hero__reveal/);
   assert.doesNotMatch(landing, /Australia-first validation|Scroll to reveal/);
   assert.doesNotMatch(landing, /landing-horizon-beam|landing-scroll-cue/);
@@ -194,13 +194,13 @@ test("Funded Scout and tester campaign screens keep the payment-to-evidence cont
       readFile(new URL("lib/product/db.ts", root), "utf8"),
     ]);
 
-  assert.match(scout, /Funded through Pinch · Campaign active/);
+  assert.match(scout, /Funded through Pinch · Validation run active/);
   assert.match(scout, /https:\/\/www\.ingenworkspace\.com/);
   assert.match(scout, /AI-generated prototype analysis/);
-  assert.match(scout, /Open tester mission/);
+  assert.match(scout, /Open tester tasks/);
   assert.match(browserSurface, /Fallback preview — not live/);
   assert.match(browserHook, /\/api\/browser\/session/);
-  assert.match(tester, /Reward is reserved from the funded campaign/);
+  assert.match(tester, /Reward is reserved from the funded validation run/);
   assert.match(tester, /Positive feedback is not required/);
   assert.match(tester, /Submit evidence for review/);
   assert.match(campaignStore, /sub_\$\{crypto\.randomUUID\(\)\}/);
@@ -245,7 +245,7 @@ test("Founder results separate live evidence from seeded data and activation sta
   assert.match(results, /One live submission and three seeded examples/);
   assert.match(results, /Seeded demo data/);
   assert.match(results, /Live demo submission/);
-  assert.match(results, /Launch founding-user campaign/);
+  assert.match(results, /Launch founding-user run/);
   assert.match(resultsPage, /CampaignResultsHandoff/);
 
   assert.match(activation, /Prototype activation ledger/);
