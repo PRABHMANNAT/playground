@@ -9,18 +9,46 @@ const FOUNDER_ENTRY = "/founder/new";
 const WORKFLOW = [
   {
     number: "01",
-    title: "PASTE",
-    copy: "Your link and the one decision you're stuck on.",
+    title: "Paste",
+    copy: "Your link and the one decision you're stuck on",
   },
   {
     number: "02",
-    title: "FUND",
-    copy: "Pinch splits the payment across five matched testers.",
+    title: "Test plan",
+    copy: "Scout connects a live browser and builds the tasks",
   },
   {
     number: "03",
-    title: "DECIDE",
-    copy: "Three fixes and a Ship / Modify / Kill verdict.",
+    title: "Fund",
+    copy: "Split payment across five matched testers",
+    pinch: true,
+  },
+  {
+    number: "04",
+    title: "Confirm",
+    copy: "Signed webhook lands, the run goes live",
+    pinch: true,
+  },
+  {
+    number: "05",
+    title: "Test",
+    copy: "Real users run the tasks, evidence captured",
+  },
+  {
+    number: "06",
+    title: "Verdict",
+    copy: "Ship / Modify / Kill, plus three fixes",
+  },
+  {
+    number: "07",
+    title: "Pay reviewer",
+    copy: "One call: tester paid, platform fee split",
+    pinch: true,
+  },
+  {
+    number: "08",
+    title: "Settled",
+    copy: "Funds land in the tester's bank account",
   },
 ];
 
@@ -159,22 +187,6 @@ export function LandingPage() {
                   </div>
                 </div>
               </div>
-
-              <div className="landing-split-card__divider" aria-hidden="true" />
-
-              <footer className="landing-split-card__footer">
-                <div className="landing-split-card__request">
-                  <code>POST /payments/realtime</code>
-                  <code>applicationFee: 4900</code>
-                </div>
-                <p>
-                  pmt_8Kd2Xq ·{" "}
-                  <strong className="landing-preview__approved">
-                    approved
-                  </strong>{" "}
-                  · test mode
-                </p>
-              </footer>
             </article>
 
             <div className="landing-hero__reveal">
@@ -189,20 +201,29 @@ export function LandingPage() {
         </section>
 
         <section className="landing-shell landing-flow" id="how-it-works">
-          <h2>How it works</h2>
+          <p className="landing-flow__eyebrow">
+            PINCH POWERS 3 OF THE 8 STEPS
+          </p>
           <ol>
             {WORKFLOW.map((step) => (
-              <li key={step.number}>
-                <div className="landing-flow__step">
+              <li
+                className={step.pinch ? "landing-flow__pinch-step" : undefined}
+                key={step.number}
+              >
+                <div className="landing-flow__marker">
                   <span className="landing-flow__index" aria-hidden="true">
                     {step.number}
                   </span>
-                  <div>
-                    <strong className="landing-flow__label">
-                      {step.title}
-                    </strong>
-                    <p className="landing-flow__copy">{step.copy}</p>
-                  </div>
+                  <i className="landing-flow__dot" aria-hidden="true" />
+                </div>
+                <div className="landing-flow__content">
+                  <strong className="landing-flow__label">
+                    {step.title}
+                  </strong>
+                  {step.pinch ? (
+                    <span className="landing-flow__pinch-tag">PINCH</span>
+                  ) : null}
+                  <p className="landing-flow__copy">{step.copy}</p>
                 </div>
               </li>
             ))}
