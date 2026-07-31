@@ -221,10 +221,7 @@
 
 .founder--brief {
   background-color: #fff;
-  background-image:
-    linear-gradient(rgba(91, 126, 191, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(91, 126, 191, 0.2) 1px, transparent 1px);
-  background-size: 88px 88px;
+  background-image: none;
 }
 
 .founder--brief .founder-nav {
@@ -240,26 +237,7 @@
 
 .founder--brief .founder-main::before,
 .founder--brief .founder-main::after {
-  position: absolute;
-  z-index: 0;
-  content: "";
-  pointer-events: none;
-}
-
-.founder--brief .founder-main::before {
-  top: 0;
-  right: 8%;
-  width: 160px;
-  height: 11px;
-  background: #11afe3;
-}
-
-.founder--brief .founder-main::after {
-  top: 88px;
-  right: 0;
-  width: 22px;
-  height: 22px;
-  background: #1118bd;
+  display: none;
 }
 
 .founder--brief .founder-heading,
