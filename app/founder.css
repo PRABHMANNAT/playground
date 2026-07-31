@@ -221,7 +221,10 @@
 
 .founder--brief {
   background-color: #fff;
-  background-image: none;
+  background-image:
+    linear-gradient(rgba(91, 126, 191, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 126, 191, 0.2) 1px, transparent 1px);
+  background-size: 88px 88px;
 }
 
 .founder--brief .founder-nav {
