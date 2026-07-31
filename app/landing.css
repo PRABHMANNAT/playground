@@ -483,7 +483,11 @@
   justify-content: space-between;
   gap: 16px;
   padding: 22px 24px 18px;
-  background: rgba(10, 6, 5, 0.42);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 6, 5, 0.84);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  backdrop-filter: blur(12px) saturate(110%);
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
   color: rgba(255, 255, 255, 0.82);
   font-family: var(--font-geist-mono), monospace;
   font-size: 10px;
@@ -513,6 +517,17 @@
     0 1px 0 rgba(255, 255, 255, 0.12) inset,
     0 14px 34px -24px rgba(0, 0, 0, 0.95);
   font-family: var(--font-geist-mono), monospace;
+}
+
+.landing-split-card__node--founder {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(10, 6, 5, 0.92);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.16) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.025),
+    0 18px 40px -22px rgba(0, 0, 0, 0.98);
+  backdrop-filter: blur(14px) saturate(110%);
+  -webkit-backdrop-filter: blur(14px) saturate(110%);
 }
 
 .landing-split-card__node span {
