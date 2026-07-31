@@ -1,9 +1,39 @@
 import type {
+  EarningRecord,
   FounderFinding,
   Project,
   ReviewerProfile,
   SessionTask,
 } from "@/lib/product/types";
+
+export const DEMO_EARNING: EarningRecord = {
+  id: "earning-cmp-001-sarah",
+  sessionId: "session-cmp-001-sarah",
+  projectId: "ingen",
+  amount: 30,
+  currency: "AUD",
+  status: "paid",
+  description: "Can a recruiter understand the product?",
+  submittedAt: Date.UTC(2026, 6, 31, 4, 40, 0),
+  approvedAt: Date.UTC(2026, 6, 31, 4, 42, 0),
+  paidAt: Date.UTC(2026, 6, 31, 4, 42, 2),
+  pinchResponse: {
+    id: "pmt_XXXXXXXX",
+    status: "approved",
+    environment: "test",
+    amount: 4_000,
+    currency: "AUD",
+    applicationFee: 1_000,
+    estimatedTransferDate: "2026-08-03",
+    description: "Playground review cmp_001 · Sarah Chen",
+    metadata: {
+      runId: "cmp_001",
+      testerId: "sarah-chen",
+      findings: 4,
+      verdict: "modify",
+    },
+  },
+};
 
 export const DEMO_REVIEWER: ReviewerProfile = {
   id: "alex-morgan",

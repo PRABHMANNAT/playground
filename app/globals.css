@@ -1,10 +1,15 @@
 @import "tailwindcss";
 @import "./product.css";
 @import "./landing.css";
+@import "./landing-2.css";
 @import "./founder.css";
 @import "./payment.css";
+@import "./fund.css";
 @import "./campaign-workflow.css";
 @import "./results-activation.css";
+@import "./verdict-pay.css";
+@import "./tester-earnings.css";
+@import "./tester-workspace.css";
 
 :root {
   --background: #f3eee6;

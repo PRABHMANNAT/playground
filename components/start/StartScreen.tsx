@@ -12,19 +12,17 @@ const ROLE_DETAILS = {
     eyebrow: "FOUNDER",
     heading: "I'm a founder",
     subheading: "Validate a product before you launch",
-    meta: "A$199 · 5 testers · results in 24 hours",
     terminal: "> initialising founder workspace",
     destination: "/founder/new",
-    cta: "Start a validation →",
+    cta: "Start a validation",
   },
   tester: {
     eyebrow: "TESTER",
     heading: "I'm a tester",
     subheading: "Get paid to test real products",
-    meta: "A$30 per approved review · paid via Pinch",
     terminal: "> loading available validation runs",
-    destination: "/tester",
-    cta: "Find work →",
+    destination: "/tester/projects",
+    cta: "Find work",
   },
 } as const;
 
@@ -139,7 +137,13 @@ export function StartScreen() {
             <button
               className={styles.rolePanel}
               key={role}
-              onClick={() => chooseRole(role)}
+              onClick={() => {
+                if (role === "tester") {
+                  router.push(detail.destination);
+                  return;
+                }
+                chooseRole(role);
+              }}
               tabIndex={activeRole ? -1 : 0}
               type="button"
             >
@@ -147,8 +151,10 @@ export function StartScreen() {
                 <span className={styles.eyebrow}>{detail.eyebrow}</span>
                 <span className={styles.heading}>{detail.heading}</span>
                 <span className={styles.subheading}>{detail.subheading}</span>
-                <span className={styles.meta}>{detail.meta}</span>
-                <span className={styles.continue}>{detail.cta}</span>
+                <span className={styles.continue}>
+                  {detail.cta}
+                  <span aria-hidden="true">›</span>
+                </span>
               </span>
             </button>
           );
@@ -187,6 +193,7 @@ export function StartScreen() {
                   <span>Name</span>
                   <input
                     autoComplete="name"
+                    className={styles.blurredInput}
                     onChange={(event) => setName(event.target.value)}
                     ref={nameInputRef}
                     required
@@ -199,6 +206,7 @@ export function StartScreen() {
                   <span>Email</span>
                   <input
                     autoComplete="email"
+                    className={styles.blurredInput}
                     onChange={(event) => setEmail(event.target.value)}
                     required
                     type="email"
@@ -207,7 +215,6 @@ export function StartScreen() {
                 </label>
 
                 <button type="submit">Enter workspace →</button>
-                <small>No password. Test mode.</small>
               </form>
             ) : null}
           </section>

@@ -221,6 +221,19 @@ export interface EarningRecord {
   submittedAt: number;
   approvedAt: number | null;
   paidAt: number | null;
+  pinchResponse?: StoredPinchPaymentResponse;
+}
+
+export interface StoredPinchPaymentResponse {
+  id: string;
+  status: "approved" | "pending" | "failed";
+  environment: "test";
+  amount: number;
+  currency: "AUD";
+  applicationFee: number;
+  estimatedTransferDate: string;
+  description: string;
+  metadata: Record<string, string | number | boolean | null>;
 }
 
 export interface PressureTest {

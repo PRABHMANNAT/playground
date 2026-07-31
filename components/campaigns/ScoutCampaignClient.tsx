@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ProductBrowserSurface } from "@/components/campaigns/ProductBrowserSurface";
@@ -134,8 +135,11 @@ export function ScoutCampaignClient({
 
   return (
     <main className="cw-shell">
-      <header className="cw-topbar">
-        <Link className="cw-brand" href="/">
+      <header className="run-fund__header scout-nav">
+        <Link className="run-fund__brand" href="/landing-2">
+          <span className="run-fund__brand-mark" aria-hidden="true">
+            <Image src="/fund-playground-logo.png" alt="" width={38} height={38} />
+          </span>
           <span aria-hidden="true">P</span>
           Playground
         </Link>
@@ -147,6 +151,20 @@ export function ScoutCampaignClient({
               ? "Funded through Pinch · Validation run active"
               : "Validation run not active"}
         </div>
+        <div className="run-fund__pinch">
+          <span className="run-fund__pinch-mark" aria-hidden="true">
+            <Image src="/pinch-payments-logo.png" alt="" width={496} height={200} />
+          </span>
+          <span className="run-fund__pinch-copy">
+            <span>Powered by</span>
+            <strong>Pinch Payments</strong>
+          </span>
+        </div>
+        <nav className="run-fund__nav" aria-label="Primary navigation">
+          <Link className="run-fund__nav-cta" href="/start">
+            Switch Project
+          </Link>
+        </nav>
       </header>
 
       <div className="cw-page">
@@ -192,7 +210,7 @@ export function ScoutCampaignClient({
           </div>
           <div>
             <dt>Funding</dt>
-            <dd>{campaignIsActive ? "A$199 funded" : "Awaiting funding"}</dd>
+            <dd>{campaignIsActive ? "A$200 funded" : "Awaiting funding"}</dd>
           </div>
           <div>
             <dt>Environment</dt>
@@ -422,7 +440,7 @@ export function ScoutCampaignClient({
               </div>
               <div>
                 <dt>Amount</dt>
-                <dd>A$199.00</dd>
+                <dd>A$200.00</dd>
               </div>
               <div>
                 <dt>Status</dt>

@@ -5,6 +5,8 @@ import test from "node:test";
 // without needing the "@/" path alias to be resolved at runtime.
 import {
   CAMPAIGN_PRICING,
+  RUN_PRICING,
+  calculateRunSplit,
   DEMO_CAMPAIGN_FORM,
   FIRST_FIVE_PACKAGE,
   PACKAGE_TESTER_COUNT,
@@ -13,14 +15,29 @@ import {
   toCents,
 } from "../lib/campaign/package.ts";
 
+test("the run split recalculates exactly from three to eight testers", () => {
+  for (
+    let testerCount = RUN_PRICING.minTesters;
+    testerCount <= RUN_PRICING.maxTesters;
+    testerCount += 1
+  ) {
+    const split = calculateRunSplit(testerCount);
+    assert.equal(split.total, testerCount * 40);
+    assert.equal(split.testers, testerCount * 30);
+    assert.equal(split.playground, testerCount * 10);
+    assert.equal(split.applicationFee, testerCount * 1_000);
+    assert.equal(split.testers + split.playground, split.total);
+  }
+});
+
 test("the order summary splits the campaign price exactly", () => {
   const { campaignFunding, testerRewardPool, foundingUserPool, grossMargin } =
     CAMPAIGN_PRICING;
 
-  assert.equal(campaignFunding, 199);
-  assert.equal(testerRewardPool, 120);
-  assert.equal(foundingUserPool, 20);
-  assert.equal(grossMargin, 59);
+  assert.equal(campaignFunding, 200);
+  assert.equal(testerRewardPool, 150);
+  assert.equal(foundingUserPool, 0);
+  assert.equal(grossMargin, 50);
   assert.equal(
     testerRewardPool + foundingUserPool + grossMargin,
     campaignFunding,
@@ -30,8 +47,8 @@ test("the order summary splits the campaign price exactly", () => {
 });
 
 test("Pinch receives the price in cents", () => {
-  assert.equal(toCents(CAMPAIGN_PRICING.campaignFunding), 19_900);
-  assert.equal(formatAud(CAMPAIGN_PRICING.campaignFunding), "A$199");
+  assert.equal(toCents(CAMPAIGN_PRICING.campaignFunding), 20_000);
+  assert.equal(formatAud(CAMPAIGN_PRICING.campaignFunding), "A$200");
 });
 
 test("only one package exists and it matches the brief", () => {

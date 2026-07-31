@@ -469,24 +469,36 @@
 
 .founder-brief__tasks {
   margin-top: 20px;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--founder-line);
 }
 
 .founder-brief__tasks ol {
   display: grid;
-  gap: 10px;
-  margin: 14px 0 0;
+  gap: 8px;
+  margin: 13px 0 0;
   padding: 0;
   list-style: none;
 }
 
 .founder-brief__tasks li {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  align-items: baseline;
-  gap: 10px;
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 13px;
+  padding: 10px 12px;
+  border: 1px solid var(--founder-line-strong);
+  background: rgba(255, 255, 255, 0.72);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.founder-brief__tasks li:hover {
+  border-color: var(--founder-ink);
+  background: #fff;
 }
 
 .founder-brief__tasks li > span {
+  min-width: 22px;
   color: var(--founder-accent-deep);
   font-family: var(--font-geist-mono), monospace;
   font-size: 11px;
@@ -500,6 +512,14 @@
   line-height: 1.45;
 }
 
+.founder-brief__tasks li::after {
+  margin-left: auto;
+  color: var(--founder-ink);
+  content: "→";
+  font-size: 17px;
+  line-height: 1;
+}
+
 .founder-brief__task-meta {
   margin: 16px 0 0;
   color: var(--founder-subtle);
@@ -509,13 +529,42 @@
 
 .founder-brief__gate {
   display: grid;
-  gap: 3px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
   margin-top: 20px;
-  padding: 11px 12px;
-  border: 1px solid #dbc79d;
-  border-radius: 9px;
-  background: #fbf4df;
-  color: #745c2a;
+  padding: 13px 14px;
+  border: 1px solid var(--founder-line-strong);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--founder-ink);
+  box-shadow: 0 8px 20px -18px rgba(10, 10, 10, 0.5);
+}
+
+.founder-brief__gate-brand {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-width: 58px;
+  padding-right: 12px;
+  border-right: 1px solid var(--founder-line);
+}
+
+.founder-brief__gate-brand img {
+  width: 52px;
+  height: auto;
+}
+
+.founder-brief__gate-brand span {
+  color: var(--founder-subtle);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+}
+
+.founder-brief__gate-copy {
+  display: grid;
+  gap: 4px;
 }
 
 .founder-brief__gate strong {
@@ -523,9 +572,20 @@
   font-weight: 700;
 }
 
-.founder-brief__gate span {
+.founder-brief__gate-copy span {
+  color: var(--founder-subtle);
   font-size: 11px;
   line-height: 1.4;
+}
+
+.founder-brief__gate-status {
+  padding: 5px 7px;
+  border: 1px solid var(--founder-line-strong);
+  border-radius: 999px;
+  color: var(--founder-subtle);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
 }
 
 .founder-brief__fund {
@@ -1261,6 +1321,17 @@
   background: #f75f1c;
 }
 
+.founder-brief__fund {
+  border-color: #080808;
+  background: #080808;
+  box-shadow: 0 1px 2px rgba(45, 36, 28, 0.1), 0 12px 26px -16px rgba(8, 8, 8, 0.65);
+  color: #fff;
+}
+
+.founder-brief__fund:hover:not(:disabled) {
+  background: #292929;
+}
+
 /* The global focus ring is orange and would vanish on an orange button. */
 .founder-btn--primary:focus-visible {
   outline: 2px solid var(--founder-ink);
@@ -1475,6 +1546,15 @@
   .founder-brief__review-actions {
     width: 100%;
     flex-wrap: wrap;
+  }
+
+  .founder-brief__gate {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .founder-brief__gate-status {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .founder-brief__load-button {

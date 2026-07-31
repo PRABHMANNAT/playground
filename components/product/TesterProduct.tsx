@@ -1,9 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { HomeSimple, ProfileCircle, Suitcase, Wallet } from "iconoir-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 
 import {
   acceptProject,
@@ -12,7 +21,6 @@ import {
   declineProject,
   importExtensionEvidence,
   playgroundDb,
-  resetDemoData,
   seedDemoData,
   submitSession,
 } from "@/lib/product/db";
@@ -78,7 +86,6 @@ function DemoGate({ children }: { children: React.ReactNode }) {
 
 export function TesterShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const reviewer = useLiveQuery(() => playgroundDb.reviewers.get("alex-morgan"));
   const activeSession = useLiveQuery(() =>
     playgroundDb.sessions
@@ -87,9 +94,10 @@ export function TesterShell({ children }: { children: React.ReactNode }) {
   );
 
   const nav = [
-    { href: "/tester", label: "Overview" },
-    { href: "/tester/projects", label: "Projects" },
-    { href: "/tester/profile", label: "Profile" },
+    { href: "/tester", label: "Overview", icon: <HomeSimple /> },
+    { href: "/tester/projects", label: "Projects", icon: <Suitcase /> },
+    { href: "/tester/earnings", label: "Earnings", icon: <Wallet /> },
+    { href: "/tester/profile", label: "Profile", icon: <ProfileCircle /> },
   ];
 
   useEffect(() => {
@@ -101,7 +109,9 @@ export function TesterShell({ children }: { children: React.ReactNode }) {
       <div className="product-app">
         <aside className="product-nav">
           <Link className="product-logo" href="/tester">
-            <span>P</span>
+            <span className="product-logo__mark">
+              <Image src="/fund-playground-logo.png" alt="" width={42} height={42} priority />
+            </span>
             <div>
               <strong>Playground</strong>
               <small>Tester workspace</small>
@@ -119,13 +129,7 @@ export function TesterShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 key={item.href}
               >
-                <span aria-hidden="true">
-                  {item.label === "Overview"
-                    ? "⌂"
-                    : item.label === "Projects"
-                      ? "◇"
-                      : "○"}
-                </span>
+                <span className="product-nav__icon" aria-hidden="true">{item.icon}</span>
                 {item.label}
               </Link>
             ))}
@@ -141,40 +145,21 @@ export function TesterShell({ children }: { children: React.ReactNode }) {
             </Link>
           )}
           <div className="product-nav__footer">
-            <div className="mini-avatar">AM</div>
+            <Avatar className="mini-avatar">
+              <AvatarImage
+                src="https://api.dicebear.com/9.x/avataaars/svg?seed=Prabhmannat%20Singh&top=turban&backgroundColor=transparent"
+                alt="Prabhmannat Singh"
+              />
+              <AvatarFallback>PS</AvatarFallback>
+              <AvatarBadge aria-label="Reviewer available" />
+            </Avatar>
             <div>
-              <strong>{reviewer?.displayName ?? "Alex Morgan"}</strong>
+              <strong>Prabhmannat Singh</strong>
               <small>Quality {reviewer?.qualityScore ?? 4.8}</small>
             </div>
           </div>
         </aside>
         <div className="product-main">
-          <header className="product-topbar">
-            <div>
-              <span className="eyebrow">Private reviewer queue</span>
-              <strong>Evidence-backed product testing</strong>
-            </div>
-            <div className="product-topbar__actions">
-              <span className="demo-badge">Demo mode</span>
-              <button
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      "Reset all locally saved Playground demo data on this device?",
-                    )
-                  ) {
-                    void resetDemoData().then(() => {
-                      router.push("/tester");
-                      router.refresh();
-                    });
-                  }
-                }}
-                type="button"
-              >
-                Reset demo
-              </button>
-            </div>
-          </header>
           {children}
         </div>
       </div>
@@ -238,7 +223,7 @@ function ProjectCard({
         {project.demoBriefOnly && (
           <span className="brief-only">Demo brief only · no product URL</span>
         )}
-        <Link href={`/tester/projects/${project.id}`}>View project →</Link>
+        <Link href={`/tester/projects/${project.id}/workspace`}>Open workspace →</Link>
       </div>
     </article>
   );
@@ -358,81 +343,167 @@ export function TesterDashboard() {
 }
 
 export function ProjectsQueue() {
-  const [sort, setSort] = useState("match");
-  const [search, setSearch] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const swipeStart = useRef<number | null>(null);
   const queriedProjects = useLiveQuery(() => playgroundDb.projects.toArray());
   const assignments =
     useLiveQuery(() => playgroundDb.assignments.toArray()) ?? [];
-  const visible = useMemo(() => {
-    const projects = queriedProjects ?? [];
-    const query = search.trim().toLowerCase();
-    return [...projects]
-      .filter(
-        (project) =>
-          !query ||
-          `${project.name} ${project.tagline} ${project.testType}`
-            .toLowerCase()
-            .includes(query),
-      )
-      .sort((a, b) =>
-        sort === "reward"
-          ? b.reward - a.reward
-          : sort === "short"
-            ? a.estimatedMinutes - b.estimatedMinutes
-            : b.matchScore - a.matchScore,
-      );
-  }, [queriedProjects, search, sort]);
+  const visible = useMemo(
+    () => [...(queriedProjects ?? [])].sort((a, b) => b.matchScore - a.matchScore),
+    [queriedProjects],
+  );
+  const activeProject = visible[activeIndex] ?? null;
+  const activeAssignment = activeProject
+    ? assignments.find((item) => item.projectId === activeProject.id)
+    : undefined;
+
+  useEffect(() => {
+    if (activeIndex >= visible.length) setActiveIndex(0);
+  }, [activeIndex, visible.length]);
+
+  const moveProject = (direction: number) => {
+    if (visible.length < 2) return;
+    setActiveIndex((current) => (current + direction + visible.length) % visible.length);
+  };
+
+  const finishSwipe = (clientX: number) => {
+    if (swipeStart.current === null) return;
+    const distance = clientX - swipeStart.current;
+    swipeStart.current = null;
+    if (Math.abs(distance) > 55) moveProject(distance < 0 ? 1 : -1);
+  };
 
   return (
     <TesterShell>
-      <main className="product-page">
-        <section className="page-heading">
+      <main className="product-page project-discovery-page">
+        <section className="project-discovery-heading">
           <div>
             <span className="eyebrow">Matched review queue</span>
-            <h1>Projects selected for you</h1>
+            <h1>Choose a product worth testing.</h1>
             <p>
-              Assignments are matched privately to your professional profile.
+              Private projects matched to your HR technology and product-review experience.
             </p>
           </div>
+          <div className="project-discovery-count">
+            <strong>{String(activeIndex + 1).padStart(2, "0")}</strong>
+            <span>/ {String(visible.length).padStart(2, "0")} matches</span>
+          </div>
         </section>
-        <div className="project-toolbar">
-          <label>
-            <span className="sr-only">Search projects</span>
-            <input
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search product, domain or test type"
-              type="search"
-              value={search}
-            />
-          </label>
+
+        {activeProject ? (
+          <article
+            className={`project-swipe-card project-swipe-card--${activeProject.id}`}
+            onPointerDown={(event) => {
+              swipeStart.current = event.clientX;
+            }}
+            onPointerUp={(event) => finishSwipe(event.clientX)}
+          >
+            <section className="project-swipe-card__story">
+              <div className="project-swipe-card__meta">
+                <span>{activeProject.name}</span>
+                <StatusBadge status={activeAssignment?.status ?? activeProject.status} />
+              </div>
+              <h2>
+                {activeProject.id === "ingen"
+                  ? "Help hiring teams trust the signal before the shortlist."
+                  : "Make company knowledge easier to find, trust and act on."}
+              </h2>
+              <p className="project-swipe-card__summary">{activeProject.objective}</p>
+
+              <div className="project-swipe-card__actions">
+                <Link href={`/tester/projects/${activeProject.id}/workspace`}>
+                  Open workspace <span aria-hidden="true">→</span>
+                </Link>
+                <button onClick={() => moveProject(1)} type="button">
+                  Next match <span aria-hidden="true">→</span>
+                </button>
+              </div>
+
+              <dl className="project-swipe-card__metrics">
+                <div>
+                  <dt>Reward</dt>
+                  <dd>{money(activeProject.reward)}</dd>
+                </div>
+                <div>
+                  <dt>Time</dt>
+                  <dd>{activeProject.estimatedMinutes} min</dd>
+                </div>
+                <div>
+                  <dt>Match</dt>
+                  <dd>{activeProject.matchScore}%</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section className="project-swipe-card__identity">
+              <div className="project-swipe-card__logo-wrap">
+                {activeProject.id === "ingen" ? (
+                  <Image
+                    alt="Browser identity interface reference for the Ingen review"
+                    className="project-swipe-card__media-image"
+                    height={1080}
+                    src="/browserbase-identity.webp"
+                    width={1240}
+                  />
+                ) : (
+                  <video
+                    aria-label="Orchestra product walkthrough"
+                    autoPlay
+                    className="project-swipe-card__media-video"
+                    controls
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    src="/orchestra-workspace.mp4"
+                  />
+                )}
+              </div>
+              <div className="project-swipe-card__details">
+                <div>
+                  <span>Product brief</span>
+                  <strong>{activeProject.tagline}</strong>
+                </div>
+                <div>
+                  <span>Review format</span>
+                  <strong>{activeProject.testType}</strong>
+                </div>
+                <div>
+                  <span>Your perspective</span>
+                  <ul>
+                    {activeProject.whyMatched.slice(0, 3).map((reason) => (
+                      <li key={reason}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <footer>
+                <span>Swipe left or right</span>
+                <strong>{activeProject.taskCount} guided tasks</strong>
+              </footer>
+            </section>
+          </article>
+        ) : (
+          <div className="empty-product-state" role="status">
+            <h2>Preparing your matched projects…</h2>
+          </div>
+        )}
+
+        <nav className="project-swipe-controls" aria-label="Browse matched projects">
+          <button aria-label="Previous project" onClick={() => moveProject(-1)} type="button">←</button>
           <div>
-            {[
-              ["match", "Best matches"],
-              ["reward", "Highest reward"],
-              ["short", "Shortest tests"],
-            ].map(([value, label]) => (
+            {visible.map((project, index) => (
               <button
-                aria-pressed={sort === value}
-                key={value}
-                onClick={() => setSort(value)}
+                aria-label={`Show ${project.name}`}
+                aria-pressed={index === activeIndex}
+                key={project.id}
+                onClick={() => setActiveIndex(index)}
                 type="button"
-              >
-                {label}
-              </button>
+              />
             ))}
           </div>
-        </div>
-        <section className="project-queue">
-          {visible.map((project) => (
-            <ProjectCard
-              assignment={assignments.find(
-                (item) => item.projectId === project.id,
-              )}
-              key={project.id}
-              project={project}
-            />
-          ))}
-        </section>
+          <button aria-label="Next project" onClick={() => moveProject(1)} type="button">→</button>
+        </nav>
       </main>
     </TesterShell>
   );
@@ -1611,6 +1682,8 @@ export function SubmittedDetail({ sessionId }: { sessionId: string }) {
   const [exportState, setExportState] = useState<
     "idle" | "exporting" | "error"
   >("idle");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [invitedEmails, setInvitedEmails] = useState<string[]>([]);
   const session = useLiveQuery(() => playgroundDb.sessions.get(sessionId));
   const feedback =
     useLiveQuery(() =>
@@ -1670,6 +1743,33 @@ export function SubmittedDetail({ sessionId }: { sessionId: string }) {
               </article>
             ))}
           </div>
+        </section>
+        <section className="submission-next-grid">
+          <article className="review-panel">
+            <span className="eyebrow">Next task</span>
+            <h2>Bring one more HR voice into the review</h2>
+            <p>Invite a recruiter, hiring manager, or HR operations teammate who can pressure-test the same workflow from their field.</p>
+            <div className="submission-next-actions">
+              <Link className="primary-action" href="/tester/projects/ingen/workspace">Review another project</Link>
+              <Link className="secondary-action" href="/tester/earnings">View Pinch earnings</Link>
+            </div>
+          </article>
+          <article className="review-panel referral-panel">
+            <span className="eyebrow">Referral workspace</span>
+            <h2>Invite a referred tester</h2>
+            <form onSubmit={(event: FormEvent<HTMLFormElement>) => {
+              event.preventDefault();
+              const value = inviteEmail.trim();
+              if (!value || invitedEmails.includes(value)) return;
+              setInvitedEmails((current) => [...current, value]);
+              setInviteEmail("");
+            }}>
+              <input aria-label="Referred tester email" onChange={(event) => setInviteEmail(event.target.value)} placeholder="recruiter@company.com" type="email" value={inviteEmail} />
+              <button className="primary-action" disabled={!inviteEmail.trim()} type="submit">Send invite</button>
+            </form>
+            {invitedEmails.length > 0 && <div className="referral-list">{invitedEmails.map((email) => <span key={email}>✓ {email}</span>)}</div>}
+            <small>Invites are attached to this project and do not expose your private evidence.</small>
+          </article>
         </section>
       </main>
     </TesterShell>

@@ -72,6 +72,12 @@
   pointer-events: none;
 }
 
+/* The nav is fixed (14px offset + 60px tall), so anchored sections need to
+   stop clear of it instead of scrolling underneath. */
+.landing [id] {
+  scroll-margin-top: 96px;
+}
+
 .landing-nav__inner {
   position: relative;
   isolation: isolate;
@@ -435,8 +441,25 @@
   line-height: 0;
 }
 
+/* Legibility scrim. The artwork runs full-bleed behind the copy column, so
+   the left side needs a light wash or the halftone peaks render straight
+   through the subtitle. Fades out before the split card so the right-hand
+   side of the artwork stays untouched. */
 .landing-api-hero__frame::before {
-  display: none;
+  position: absolute;
+  z-index: 1;
+  display: block;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(247, 251, 255, 0.97) 0%,
+    rgba(247, 251, 255, 0.95) 36%,
+    rgba(247, 251, 255, 0.78) 47%,
+    rgba(247, 251, 255, 0.28) 57%,
+    rgba(247, 251, 255, 0) 66%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .landing-api-hero .landing-preview {
@@ -559,7 +582,7 @@
   color: #fff;
   font-weight: 610;
   letter-spacing: -0.055em;
-  line-height: 0.95;
+  line-height: 1.04;
   text-wrap: balance;
   text-shadow: 0 3px 32px rgba(0, 0, 0, 0.35);
 }
@@ -883,7 +906,9 @@
   font-size: clamp(36px, 4.4vw, 62px);
   font-weight: 610;
   letter-spacing: -0.055em;
-  line-height: 0.96;
+  /* Must stay above 1 — below it the ascenders of one line collide with the
+     descenders of the line above. */
+  line-height: 1.06;
   text-wrap: balance;
   text-shadow: 0 3px 32px rgba(0, 0, 0, 0.4);
 }

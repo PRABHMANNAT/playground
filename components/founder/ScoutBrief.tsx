@@ -483,15 +483,27 @@ export function ScoutBrief({
               </div>
 
               <div className="founder-brief__gate">
-                <strong>Awaiting verified Pinch payment</strong>
-                <span>Scout starts when the payment webhook confirms.</span>
+                <div className="founder-brief__gate-brand">
+                  <Image
+                    src="/pinch-payments-logo.png"
+                    alt="Pinch Payments"
+                    width={496}
+                    height={200}
+                  />
+                  <span>SECURE PAYMENT</span>
+                </div>
+                <div className="founder-brief__gate-copy">
+                  <strong>Awaiting payment confirmation</strong>
+                  <span>Scout starts automatically when Pinch confirms.</span>
+                </div>
+                <span className="founder-brief__gate-status">PENDING</span>
               </div>
 
               <Link
                 className="founder-btn founder-btn--primary founder-brief__fund"
-                href={`/founder/new?step=fund&runId=${encodeURIComponent(runId)}`}
+                href={`/runs/${encodeURIComponent(runId)}/fund?decision=${encodeURIComponent(plan.decision)}`}
               >
-                Fund this run · A$199 →
+                Fund this run · A$200 →
               </Link>
               <p className="founder-brief__pinch-note">
                 Split by Pinch across 5 testers at payment

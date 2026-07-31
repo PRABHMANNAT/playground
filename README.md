@@ -126,13 +126,13 @@ Use this route order for the 120-second recording:
 7. `/campaigns/cmp_001/results`
 8. `/campaigns/cmp_001/founding-users`
 
-The founder form is prefilled with INGEN and the A$199 package. The hidden
+The founder form is prefilled with INGEN and the A$200 package. The hidden
 development reset is available only when `?demoControls=true` is added to a
 local URL; it is omitted from normal pitch-video routes.
 
 ### Pinch integration architecture
 
-The browser submits the fixed A$199 package to
+The browser submits the fixed A$200 package to
 `POST /api/pinch/create-checkout`. The server authenticates with Pinch, creates
 or resolves the payer, creates a sandbox Payment Link, and returns only the
 hosted URL and safe Pinch identifiers. Pinch redirects back with
@@ -140,7 +140,7 @@ hosted URL and safe Pinch identifiers. Pinch redirects back with
 
 `GET /api/pinch/verify-payment` performs fresh server-side lookups for both the
 Payment and the Payment Link. A campaign activates only when the Payment has a
-funded status and both records match the A$199 amount, payer and `cmp_001`
+funded status and both records match the A$200 amount, payer and `cmp_001`
 metadata. The Payment Link identifier is also compared when Pinch includes it
 on the Payment record. Redirect parameters alone never activate a campaign.
 Credentials and access tokens stay server-side.

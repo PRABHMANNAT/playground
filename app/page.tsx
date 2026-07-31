@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { LandingPage } from "@/components/landing/LandingPage";
+import { LandingPageTwo } from "@/components/landing/LandingPageTwo";
 
 export const metadata: Metadata = {
   title: "Get your first useful users",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <LandingPage />;
+  return <LandingPageTwo />;
 }

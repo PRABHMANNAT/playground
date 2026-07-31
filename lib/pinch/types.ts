@@ -30,6 +30,8 @@ export type PinchErrorCode =
   | "pinch_payer_failed"
   | "pinch_payment_link_failed"
   | "pinch_payment_lookup_failed"
+  | "pinch_source_failed"
+  | "pinch_realtime_payment_failed"
   | "pinch_unexpected_response"
   | "pinch_unreachable";
 
@@ -124,9 +126,54 @@ export interface VerifyPaymentResult {
   mock?: true;
 }
 
+export interface FundRunInput {
+  runId: string;
+  token: string;
+  testerCount: number;
+  decision: string;
+  founderName: string;
+  founderEmail: string;
+}
+
+export interface FundRunResult {
+  payerId: string;
+  sourceId: string;
+  sourceLast4: string | null;
+  sourceBrand: string | null;
+  paymentId: string;
+  status: string;
+  amount: number;
+  applicationFee: number;
+  sourceResponse: unknown;
+  paymentResponse: unknown;
+}
+
+export interface PinchCaptureConfig {
+  publishableKey: string;
+  environment: PinchEnvironment;
+}
+
+export class PinchProviderError extends PinchError {
+  readonly providerCode: string;
+
+  constructor(
+    providerCode: string,
+    message: string,
+    status = 502,
+  ) {
+    super("pinch_realtime_payment_failed", message, status);
+    this.name = "PinchProviderError";
+    this.providerCode = providerCode;
+  }
+}
+
 export interface PinchApiErrorBody {
   error: {
-    code: PinchErrorCode | "invalid_request" | "amount_mismatch";
+    code:
+      | PinchErrorCode
+      | "invalid_request"
+      | "amount_mismatch"
+      | "payment_already_submitted";
     message: string;
   };
 }

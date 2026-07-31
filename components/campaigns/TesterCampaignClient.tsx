@@ -24,6 +24,18 @@ const TASKS = [
   "Mark anything that reduces trust.",
 ] as const;
 
+type TesterPinSeverity = "Confusing" | "Broken" | "Trust";
+
+type TesterPin = {
+  id: string;
+  xPercent: number;
+  yPercent: number;
+  severity: TesterPinSeverity;
+  note: string;
+};
+
+const PIN_STORAGE_PREFIX = "playground:tester-pins:";
+
 const ACCEPTANCE = [
   "Complete all required tasks",
   "Mark at least one confusing moment",
@@ -95,6 +107,13 @@ export function TesterCampaignClient({
   const [verdict, setVerdict] =
     useState<CampaignVerdict>("modification");
   const [originalConfirmed, setOriginalConfirmed] = useState(false);
+  const [authoringMode, setAuthoringMode] = useState<"browse" | "mark">("browse");
+  const [pins, setPins] = useState<TesterPin[]>([]);
+  const [draftPin, setDraftPin] = useState<{ xPercent: number; yPercent: number } | null>(null);
+  const [draftSeverity, setDraftSeverity] = useState<TesterPinSeverity | null>(null);
+  const [draftNote, setDraftNote] = useState("");
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [highlightedPinId, setHighlightedPinId] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const autoLaunchRef = useRef(false);
@@ -114,6 +133,26 @@ export function TesterCampaignClient({
       );
     });
   }, [campaignId]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(`${PIN_STORAGE_PREFIX}${campaignId}`);
+      if (stored) {
+        const parsed = JSON.parse(stored) as TesterPin[];
+        if (Array.isArray(parsed)) setPins(parsed);
+      }
+    } catch {
+      // Local persistence is optional for the authoring flow.
+    }
+  }, [campaignId]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(`${PIN_STORAGE_PREFIX}${campaignId}`, JSON.stringify(pins));
+    } catch {
+      // Keep the current pins in memory if storage is unavailable.
+    }
+  }, [campaignId, pins]);
 
   useEffect(() => {
     if (!browserbaseConfigured || campaignReady !== true || autoLaunchRef.current) {
@@ -152,8 +191,8 @@ export function TesterCampaignClient({
     if (completedTasks.size !== TASKS.length) {
       nextErrors.push("Complete all four required tasks.");
     }
-    if (!evidenceKinds.has("confusion")) {
-      nextErrors.push("Mark at least one confusing moment.");
+    if (pins.length === 0) {
+      nextErrors.push("Mark at least one issue on the product screen.");
     }
     if (!issue.trim()) nextErrors.push("Describe the issue you observed.");
     if (!expected.trim()) nextErrors.push("Explain what you expected.");
@@ -176,6 +215,60 @@ export function TesterCampaignClient({
       }
     }
     return nextErrors;
+  };
+
+  const submitReady =
+    campaignReady === true &&
+    completedTasks.size === TASKS.length &&
+    pins.length > 0 &&
+    originalConfirmed;
+
+  const submitReason = !campaignReady
+    ? "The validation run is not active."
+    : completedTasks.size !== TASKS.length
+      ? `Complete all ${TASKS.length} required tasks.`
+      : pins.length === 0
+        ? "Save at least one finding on the product screen."
+        : !originalConfirmed
+          ? "Confirm that this is your original feedback."
+          : "Ready to submit.";
+
+  const handlePinLayerClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (authoringMode !== "mark" || draftPin) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const xPercent = Math.round(((event.clientX - rect.left) / rect.width) * 10000) / 100;
+    const yPercent = Math.round(((event.clientY - rect.top) / rect.height) * 10000) / 100;
+    setDraftPin({ xPercent, yPercent });
+    setDraftSeverity(null);
+    setDraftNote("");
+    setPinError(null);
+  };
+
+  const savePin = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!draftPin || !draftSeverity || !draftNote.trim()) {
+      setPinError("Choose a severity and add a one-line note.");
+      return;
+    }
+    const pin: TesterPin = {
+      id: `pin-${crypto.randomUUID()}`,
+      ...draftPin,
+      severity: draftSeverity,
+      note: draftNote.trim().slice(0, 140),
+    };
+    setPins((current) => [...current, pin]);
+    setHighlightedPinId(pin.id);
+    setDraftPin(null);
+    setDraftSeverity(null);
+    setDraftNote("");
+    setPinError(null);
+  };
+
+  const discardPin = () => {
+    setDraftPin(null);
+    setDraftSeverity(null);
+    setDraftNote("");
+    setPinError(null);
   };
 
   const submitEvidence = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -201,8 +294,8 @@ export function TesterCampaignClient({
         finalVerdict: verdict,
         sourceType: "live_demo",
         qualityStatus: "Quality review pending",
-        rewardAmount: 20,
-        rewardStatus: "reserved",
+        rewardAmount: 30,
+        rewardStatus: "manual_review",
       });
       if (session) {
         await handleStop();
@@ -242,9 +335,9 @@ export function TesterCampaignClient({
             </p>
           </div>
           <div className="cw-reward-card">
-            <span>Reserved reward</span>
-            <strong>A$20</strong>
-            <small>Quality review required</small>
+            <span>Tester payout</span>
+            <strong>A$30</strong>
+            <small>Paid by Pinch on approval</small>
           </div>
         </section>
 
@@ -255,7 +348,7 @@ export function TesterCampaignClient({
           </div>
           <div>
             <dt>Reward</dt>
-            <dd>A$20</dd>
+            <dd>A$30</dd>
           </div>
           <div>
             <dt>Expected time</dt>
@@ -280,16 +373,16 @@ export function TesterCampaignClient({
         </dl>
 
         {campaignReady === false ? (
-          <p className="cw-reserved-note cw-reserved-note--blocked" role="alert">
+          <p className="cw-payout-note cw-payout-note--blocked" role="alert">
             <span aria-hidden="true">!</span>
             This validation run is not active. Complete the verified Pinch sandbox
             payment before submitting evidence.
           </p>
         ) : (
-          <p className="cw-reserved-note">
+          <p className="cw-payout-note">
             <span aria-hidden="true">◇</span>
-            Reward is reserved from the funded validation run. Initial tester payouts
-            are manually reviewed.
+            Tester payout is processed by Pinch after approval. Initial reviews are
+            manually checked for quality.
           </p>
         )}
 
@@ -329,16 +422,100 @@ export function TesterCampaignClient({
                 </button>
               </div>
             </div>
-            <ProductBrowserSurface
-              compact
-              error={browserError}
-              onDisconnect={handleDisconnect}
-              onRetry={() => void handleLaunch()}
-              productUrl={PRODUCT_URL}
-              progressMessage={progressMessage}
-              session={session}
-              status={status}
-            />
+            <div className="cw-pin-mode-toggle" role="group" aria-label="Evidence authoring mode">
+              <span>Evidence mode</span>
+              <button
+                aria-pressed={authoringMode === "browse"}
+                className={authoringMode === "browse" ? "is-active" : ""}
+                onClick={() => {
+                  setAuthoringMode("browse");
+                  discardPin();
+                }}
+                type="button"
+              >
+                Browse
+              </button>
+              <button
+                aria-pressed={authoringMode === "mark"}
+                className={authoringMode === "mark" ? "is-active" : ""}
+                onClick={() => setAuthoringMode("mark")}
+                type="button"
+              >
+                Mark issue
+              </button>
+              <small>{pins.length} saved</small>
+            </div>
+            <div
+              className={`cw-pin-authoring-stage ${authoringMode === "mark" ? "is-marking" : ""}`}
+              onClick={handlePinLayerClick}
+              role={authoringMode === "mark" ? "button" : undefined}
+              tabIndex={authoringMode === "mark" ? 0 : undefined}
+              aria-label={authoringMode === "mark" ? "Click the product to place a finding pin" : undefined}
+            >
+              <ProductBrowserSurface
+                compact
+                error={browserError}
+                onDisconnect={handleDisconnect}
+                onRetry={() => void handleLaunch()}
+                productUrl={PRODUCT_URL}
+                progressMessage={progressMessage}
+                session={session}
+                status={status}
+              />
+              <div className="cw-tester-pin-layer" aria-label="Saved tester findings">
+                {pins.map((pin, index) => (
+                  <button
+                    aria-label={`Finding ${index + 1}: ${pin.severity}`}
+                    className={`founder-brief__capture-pin ${highlightedPinId === pin.id ? "is-highlighted" : ""}`}
+                    key={pin.id}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setHighlightedPinId(pin.id);
+                    }}
+                    style={{ left: `${pin.xPercent}%`, top: `${pin.yPercent}%` }}
+                    type="button"
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                {draftPin ? (
+                  <form
+                    className="cw-pin-popover"
+                    onClick={(event) => event.stopPropagation()}
+                    onSubmit={savePin}
+                    style={{ left: `${draftPin.xPercent}%`, top: `${draftPin.yPercent}%` }}
+                  >
+                    <strong>New finding</strong>
+                    <div className="cw-pin-severity" role="group" aria-label="Severity">
+                      {(["Confusing", "Broken", "Trust"] as TesterPinSeverity[]).map((option) => (
+                        <button
+                          aria-pressed={draftSeverity === option}
+                          className={draftSeverity === option ? "is-active" : ""}
+                          key={option}
+                          onClick={() => setDraftSeverity(option)}
+                          type="button"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                    <input
+                      autoFocus
+                      maxLength={140}
+                      onChange={(event) => setDraftNote(event.target.value)}
+                      placeholder="What confused you?"
+                      required
+                      value={draftNote}
+                    />
+                    {pinError ? <small className="cw-pin-error">{pinError}</small> : null}
+                    <div>
+                      <button onClick={discardPin} type="button">Discard</button>
+                      <button className="is-save" type="submit">Save</button>
+                    </div>
+                  </form>
+                ) : null}
+              </div>
+            </div>
             <div className="cw-browser-safety">
               <span>Authorised destination</span>
               <strong>{PRODUCT_URL}</strong>
@@ -410,10 +587,45 @@ export function TesterCampaignClient({
               <div className="cw-evidence-heading">
                 <div>
                   <span>03</span>
-                  <h2>Evidence controls</h2>
+                  <h2>Your findings</h2>
                 </div>
-                <small>Choose what applies</small>
+                <small>{pins.length} saved pin{pins.length === 1 ? "" : "s"}</small>
               </div>
+              {pins.length === 0 ? (
+                <p className="cw-findings-empty">
+                  No findings yet. Switch to Mark issue and click what confused you.
+                </p>
+              ) : (
+                <div className="cw-tester-findings">
+                  {pins.map((pin, index) => (
+                    <article className={highlightedPinId === pin.id ? "is-highlighted" : ""} key={pin.id}>
+                      <button
+                        className="cw-tester-finding__main"
+                        onClick={() => setHighlightedPinId(pin.id)}
+                        type="button"
+                      >
+                        <span>{index + 1}</span>
+                        <div>
+                          <strong>{pin.severity}</strong>
+                          <p>{pin.note}</p>
+                          <small>{pin.xPercent.toFixed(2)}% × {pin.yPercent.toFixed(2)}%</small>
+                        </div>
+                      </button>
+                      <button
+                        aria-label={`Delete finding ${index + 1}`}
+                        className="cw-tester-finding__delete"
+                        onClick={() => {
+                          setPins((current) => current.filter((item) => item.id !== pin.id));
+                          if (highlightedPinId === pin.id) setHighlightedPinId(null);
+                        }}
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              )}
               <div className="cw-evidence-controls">
                 {EVIDENCE_CONTROLS.map((control) => (
                   <button
@@ -554,11 +766,11 @@ export function TesterCampaignClient({
 
             <div className="cw-submit-bar">
               <div>
-                <strong>A$20 reserved</strong>
-                <span>Quality review follows submission</span>
+                <strong>A$30 · paid by Pinch on approval</strong>
+                <span>{submitReason}</span>
               </div>
               <button
-                disabled={submitting || campaignReady !== true}
+                disabled={submitting || !submitReady}
                 type="submit"
               >
                 {submitting ? "Saving evidence…" : "Submit evidence for review"}

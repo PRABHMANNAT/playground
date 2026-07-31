@@ -88,7 +88,7 @@ function PinchSplitPreview({
           <div className="landing-split-card__fork">
             <div className="landing-split-card__node landing-split-card__node--founder">
               <span>Founder</span>
-              <strong>A$199</strong>
+              <strong>A$200</strong>
             </div>
 
             <svg
@@ -122,7 +122,7 @@ function PinchSplitPreview({
               </div>
               <div className="landing-split-card__node landing-split-card__node--settled">
                 <span>Playground</span>
-                <strong>A$49.00</strong>
+                <strong>A$50.00</strong>
               </div>
             </div>
           </div>
@@ -305,7 +305,7 @@ export function LandingPage() {
                   <div className="landing-split-card__fork">
                     <div className="landing-split-card__node landing-split-card__node--founder">
                       <span>Founder</span>
-                      <strong>A$199</strong>
+                      <strong>A$200</strong>
                     </div>
 
                     <svg
@@ -339,7 +339,7 @@ export function LandingPage() {
                       </div>
                       <div className="landing-split-card__node landing-split-card__node--settled">
                         <span>Playground</span>
-                        <strong>A$49.00</strong>
+                        <strong>A$50.00</strong>
                       </div>
                     </div>
                   </div>

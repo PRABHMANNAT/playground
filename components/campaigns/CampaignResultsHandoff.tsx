@@ -282,7 +282,7 @@ export function CampaignResultsHandoff({
               <small>Prioritised for launch</small>
             </div>
             <div>
-              <dd>A$199</dd>
+              <dd>A$200</dd>
               <dt>run funding</dt>
               <small>Funded through Pinch</small>
             </div>
@@ -536,7 +536,7 @@ export function CampaignResultsHandoff({
                 <span>
                   {submission
                     ? `A$${submission.rewardAmount} ${submission.rewardStatus.replace("_", " ")}`
-                    : "A$20 reserved"}
+                    : "A$30 · paid by Pinch on approval"}
                 </span>
               </footer>
             </article>
@@ -585,7 +585,7 @@ export function CampaignResultsHandoff({
             <dl className="cw-ledger-money">
               <div>
                 <dt>Validation run funding</dt>
-                <dd>A$199</dd>
+                <dd>A$200</dd>
               </div>
               <div>
                 <dt>Tester reward pool</dt>

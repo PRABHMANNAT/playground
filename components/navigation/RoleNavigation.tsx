@@ -72,14 +72,20 @@ export function RoleNavigation({
 
   if (
     variant === "floating" &&
-    (pathname === "/" || pathname === "/start" || pathname === "/founder/new")
+    (pathname === "/" ||
+      pathname === "/landing-2" ||
+      pathname === "/start" ||
+      pathname === "/founder/new" ||
+      pathname.startsWith("/tester") ||
+      /^\/runs\/[^/]+\/fund$/.test(pathname) ||
+      /^\/runs\/[^/]+\/verdict$/.test(pathname))
   ) {
     return null;
   }
 
   const primary =
     role === "tester"
-      ? { label: "My earnings", href: "/tester" }
+      ? { label: "My earnings", href: "/tester/earnings" }
       : role === "founder" && activeRun
         ? { label: "My run", href: runDestination }
         : role === "founder"

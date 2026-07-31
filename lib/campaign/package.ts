@@ -6,11 +6,50 @@ import type {
 
 export const CAMPAIGN_PRICING: CampaignPricing = {
   currency: "AUD",
-  campaignFunding: 199,
-  testerRewardPool: 120,
-  foundingUserPool: 20,
-  grossMargin: 59,
+  campaignFunding: 200,
+  testerRewardPool: 150,
+  foundingUserPool: 0,
+  grossMargin: 50,
 };
+
+export const RUN_PRICING = {
+  minTesters: 3,
+  maxTesters: 8,
+  defaultTesters: 5,
+  perReview: 40,
+  testerReceivesPerReview: 30,
+  playgroundKeepsPerReview: 10,
+  applicationFeePerReview: 1_000,
+} as const;
+
+export type RunSplit = {
+  testerCount: number;
+  total: number;
+  testers: number;
+  playground: number;
+  applicationFee: number;
+};
+
+export function calculateRunSplit(testerCount: number): RunSplit {
+  if (
+    !Number.isInteger(testerCount) ||
+    testerCount < RUN_PRICING.minTesters ||
+    testerCount > RUN_PRICING.maxTesters
+  ) {
+    throw new RangeError(
+      `testerCount must be an integer from ${RUN_PRICING.minTesters} to ${RUN_PRICING.maxTesters}.`,
+    );
+  }
+
+  return {
+    testerCount,
+    total: testerCount * RUN_PRICING.perReview,
+    testers: testerCount * RUN_PRICING.testerReceivesPerReview,
+    playground: testerCount * RUN_PRICING.playgroundKeepsPerReview,
+    applicationFee:
+      testerCount * RUN_PRICING.applicationFeePerReview,
+  };
+}
 
 export const FIRST_FIVE_PACKAGE: CampaignPackage = {
   id: "first-five-useful-users",

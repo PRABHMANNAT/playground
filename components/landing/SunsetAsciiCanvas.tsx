@@ -128,7 +128,24 @@ function fallbackLuminance(x: number, y: number) {
   return clamp(sky * 0.72 + sun * 0.85 + railGlow - horizon);
 }
 
-export function SunsetAsciiCanvas() {
+/**
+ * @param showSunset Draw the sunset dot-art behind the Australia map.
+ *   Defaults to true so existing callers are unaffected; landing page 2
+ *   passes false to show the Australia scene on its own.
+ */
+export function SunsetAsciiCanvas({
+  showSunset = true,
+  backgroundColor = "#f5f8fc",
+  mapColorHigh = "#ffd1c2",
+  mapColorMid = "#ff8a5f",
+  mapColorLow = AUSTRALIA_PRESET.tint,
+}: {
+  showSunset?: boolean;
+  backgroundColor?: string;
+  mapColorHigh?: string;
+  mapColorMid?: string;
+  mapColorLow?: string;
+} = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -408,9 +425,17 @@ export function SunsetAsciiCanvas() {
       dotContext.fill();
       dotContext.restore();
 
-      const mapReveal = smoothstep(0.24, 0.82, scrollProgress);
+      // Without the sunset the map is the whole subject, so it is shown in
+      // full and centred rather than fading in across a long scroll runway.
+      const mapReveal = showSunset
+        ? smoothstep(0.24, 0.82, scrollProgress)
+        : 1;
       const mapScale = 0.78 + mapReveal * 0.22;
-      const mapCenterX = width < 820 ? width * 0.5 : width * 0.7;
+      const mapCenterX = showSunset
+        ? width < 820
+          ? width * 0.5
+          : width * 0.7
+        : width * 0.5;
       const mapCenterY = height * 0.48;
       australiaLayerContext.setTransform(dpr, 0, 0, dpr, 0, 0);
       australiaLayerContext.clearRect(0, 0, width, height);
@@ -433,10 +458,10 @@ export function SunsetAsciiCanvas() {
           clamp(0.44 + sample.luminance * 0.6) * flicker;
         australiaLayerContext.fillStyle =
           sample.luminance > 0.66
-            ? "#ffd1c2"
+            ? mapColorHigh
             : sample.luminance > 0.4
-              ? "#ff8a5f"
-              : AUSTRALIA_PRESET.tint;
+              ? mapColorMid
+              : mapColorLow;
         australiaLayerContext.fillText(sample.character, x, y);
       }
       australiaLayerContext.globalAlpha = 1;
@@ -444,39 +469,41 @@ export function SunsetAsciiCanvas() {
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, width, height);
       context.globalAlpha = PRESET.bgOpacity / 100;
-      context.fillStyle = "#f5f8fc";
+      context.fillStyle = backgroundColor;
       context.fillRect(0, 0, width, height);
       context.globalAlpha = 1;
       context.setTransform(1, 0, 0, 1, 0, 0);
 
-      const sunsetOpacity = 1 - smoothstep(0.12, 0.7, scrollProgress);
-      const sunsetScale = 1 + scrollProgress * 0.1;
-      const sunsetWidth = dotLayer.width * sunsetScale;
-      const sunsetHeight = dotLayer.height * sunsetScale;
-      const sunsetX = (dotLayer.width - sunsetWidth) / 2;
-      const sunsetY =
-        (dotLayer.height - sunsetHeight) / 2 + scrollProgress * 18 * dpr;
-      context.save();
-      context.globalAlpha = (PRESET.bloom / 100) * sunsetOpacity;
-      context.filter = `blur(${Math.max(3, 8 * dpr)}px)`;
-      context.drawImage(
-        dotLayer,
-        sunsetX,
-        sunsetY,
-        sunsetWidth,
-        sunsetHeight,
-      );
-      context.restore();
-      context.save();
-      context.globalAlpha = sunsetOpacity;
-      context.drawImage(
-        dotLayer,
-        sunsetX,
-        sunsetY,
-        sunsetWidth,
-        sunsetHeight,
-      );
-      context.restore();
+      if (showSunset) {
+        const sunsetOpacity = 1 - smoothstep(0.12, 0.7, scrollProgress);
+        const sunsetScale = 1 + scrollProgress * 0.1;
+        const sunsetWidth = dotLayer.width * sunsetScale;
+        const sunsetHeight = dotLayer.height * sunsetScale;
+        const sunsetX = (dotLayer.width - sunsetWidth) / 2;
+        const sunsetY =
+          (dotLayer.height - sunsetHeight) / 2 + scrollProgress * 18 * dpr;
+        context.save();
+        context.globalAlpha = (PRESET.bloom / 100) * sunsetOpacity;
+        context.filter = `blur(${Math.max(3, 8 * dpr)}px)`;
+        context.drawImage(
+          dotLayer,
+          sunsetX,
+          sunsetY,
+          sunsetWidth,
+          sunsetHeight,
+        );
+        context.restore();
+        context.save();
+        context.globalAlpha = sunsetOpacity;
+        context.drawImage(
+          dotLayer,
+          sunsetX,
+          sunsetY,
+          sunsetWidth,
+          sunsetHeight,
+        );
+        context.restore();
+      }
 
       context.save();
       context.globalAlpha = mapReveal * 0.18;
@@ -678,7 +705,7 @@ export function SunsetAsciiCanvas() {
         scene.style.removeProperty(property);
       }
     };
-  }, []);
+  }, [showSunset, backgroundColor, mapColorHigh, mapColorMid, mapColorLow]);
 
   return (
     <div className="landing-ascii" aria-hidden="true">

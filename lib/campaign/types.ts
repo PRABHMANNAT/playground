@@ -101,7 +101,7 @@ export type CampaignVerdict =
 export type SubmissionSourceType = "live_demo" | "seeded_demo";
 
 export type RewardStatus =
-  | "reserved"
+  | "pending"
   | "manual_review"
   | "approved"
   | "paid";

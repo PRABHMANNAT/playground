@@ -1,0 +1,49 @@
+/* Landing page 2.
+ *
+ * Everything is scoped under .landing2, so nothing here can affect the
+ * original landing page. The navbar and split card intentionally inherit
+ * landing.css unchanged — only the hero artwork differs.
+ */
+
+.landing2 .landing-api-hero__frame {
+  /* Drop your artwork at public/landing-2-bg.png to change this — no code
+     edit needed. */
+  --api-hero-image: url("/landing-2-bg.png");
+
+  background: var(--api-hero-image) center center / cover no-repeat, #8fd0f2;
+}
+
+/* The artwork is bright and busy across its full width, so the copy column
+   needs a slightly stronger wash than page 1 to stay readable. */
+.landing2 .landing-api-hero__frame::before {
+  background: linear-gradient(
+    100deg,
+    rgba(250, 252, 255, 0.96) 0%,
+    rgba(250, 252, 255, 0.93) 38%,
+    rgba(250, 252, 255, 0.74) 48%,
+    rgba(250, 252, 255, 0.24) 58%,
+    rgba(250, 252, 255, 0) 68%
+  );
+}
+
+/* The Australia ASCII scene is themed dark green on a white canvas through
+   props passed to SunsetAsciiCanvas (see LandingPageTwo), so no colour filter
+   is applied here and page 1 keeps its original orange. */
+
+/* Pure white behind the ASCII scene and the "Meet people" copy, replacing the
+   shared light system's faint blue-white (#f9fbff). */
+.landing2 .landing-hero {
+  background: #fff;
+}
+
+.landing2 .landing-hero::after {
+  background: transparent;
+}
+
+/* Grass-green hero highlight, replacing page 1's orange block behind the
+   headline. The .landing2 prefix outranks the shared rule in landing.css, so
+   page 1 keeps its original orange. */
+.landing2 .landing-api-hero h1 span,
+.landing2 .landing-api-hero h1 mark {
+  background: #4c9a2a;
+}

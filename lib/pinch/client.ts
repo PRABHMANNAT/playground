@@ -1,12 +1,19 @@
 import "server-only";
 
-import { CAMPAIGN_PRICING } from "@/lib/campaign/package";
+import {
+  CAMPAIGN_PRICING,
+  calculateRunSplit,
+} from "@/lib/campaign/package";
 import {
   PinchError,
+  PinchProviderError,
   isFundedStatus,
   type CreateCheckoutInput,
   type CreateCheckoutResult,
   type CreatePayerInput,
+  type FundRunInput,
+  type FundRunResult,
+  type PinchCaptureConfig,
   type PinchConfig,
   type PinchErrorCode,
   type VerifyPaymentResult,
@@ -172,7 +179,7 @@ function candidates(payload: unknown): Record<string, unknown>[] {
   }
   const record = payload as Record<string, unknown>;
   const found = [record];
-  for (const key of ["data", "result", "paymentLink", "payment"]) {
+  for (const key of ["data", "result", "paymentLink", "payment", "source"]) {
     const nested = record[key];
     if (nested && typeof nested === "object" && !Array.isArray(nested)) {
       found.push(nested as Record<string, unknown>);
@@ -508,7 +515,7 @@ export async function verifyPayment(
       status: "approved",
       paymentId,
       paymentLinkId,
-      amount: 199,
+      amount: CAMPAIGN_PRICING.campaignFunding,
       environment: "test",
       mock: true,
     };
@@ -590,5 +597,264 @@ export async function verifyPayment(
     paymentLinkId,
     amount: amountInCents === null ? null : amountInCents / 100,
     environment: "test",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* CaptureJS and realtime run funding                                         */
+/* -------------------------------------------------------------------------- */
+
+async function providerJson(
+  url: string,
+  init: RequestInit,
+  context: { step: string; campaignId?: string },
+): Promise<unknown> {
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      cache: "no-store",
+    });
+  } catch (error) {
+    logFailure(`network error during ${context.step}`, error);
+    throw new PinchError(
+      "pinch_unreachable",
+      "Playground could not reach Pinch. Check your connection and try again.",
+    );
+  }
+
+  logStep(context.step, {
+    campaignId: context.campaignId,
+    status: response.status,
+  });
+
+  const raw = await response.text();
+  let payload: unknown = {};
+  if (raw) {
+    try {
+      payload = JSON.parse(raw) as unknown;
+    } catch {
+      payload = {};
+    }
+  }
+
+  if (!response.ok) {
+    logFailure(`${context.step} returned ${response.status}`, raw.slice(0, 500));
+    const top =
+      payload && typeof payload === "object" && !Array.isArray(payload)
+        ? (payload as Record<string, unknown>)
+        : {};
+    const arrayRecords = Array.isArray(payload)
+      ? payload.filter(
+          (item): item is Record<string, unknown> =>
+            Boolean(item) && typeof item === "object" && !Array.isArray(item),
+        )
+      : [];
+    const nested =
+      top.error && typeof top.error === "object" && !Array.isArray(top.error)
+        ? (top.error as Record<string, unknown>)
+        : {};
+    const code =
+      readString([nested, top, ...arrayRecords], [
+        "dishonourCode",
+        "DishonourCode",
+        "dishonourType",
+        "DishonourType",
+        "code",
+        "Code",
+        "errorCode",
+        "ErrorCode",
+        "type",
+        "Type",
+      ]) ?? `http-${response.status}`;
+    const message =
+      readString([nested, top, ...arrayRecords], [
+        "message",
+        "Message",
+        "errorMessage",
+        "ErrorMessage",
+        "detail",
+        "Detail",
+        "title",
+        "Title",
+        "reason",
+        "Reason",
+      ]) ??
+      `Pinch rejected the payment with ${code}.`;
+    throw new PinchProviderError(code, message, response.status);
+  }
+
+  return payload;
+}
+
+export async function getPinchCaptureConfig(): Promise<PinchCaptureConfig> {
+  const config = readPinchConfig();
+  if (config.mockMode) {
+    throw new PinchError(
+      "pinch_config_missing",
+      "CaptureJS is unavailable while PINCH_MOCK_MODE is enabled.",
+      503,
+    );
+  }
+
+  const configuredKey = env("NEXT_PUBLIC_PINCH_PUBLISHABLE_KEY");
+  if (configuredKey) {
+    return { publishableKey: configuredKey, environment: "test" };
+  }
+
+  const token = await getAccessToken(config);
+  const merchant = await requestJson(
+    `${config.apiBaseUrl}/merchants`,
+    { method: "GET", headers: authorisedHeaders(token) },
+    {
+      code: "pinch_unexpected_response",
+      message:
+        "Pinch did not return the test publishable key required by CaptureJS.",
+    },
+    { step: "merchants.get" },
+  );
+
+  const publishableKey = readString(candidates(merchant), [
+    "testPublishableKey",
+    "publishableKey",
+  ]);
+  if (!publishableKey) {
+    throw new PinchError(
+      "pinch_unexpected_response",
+      "Pinch did not return the test publishable key required by CaptureJS.",
+    );
+  }
+
+  return { publishableKey, environment: "test" };
+}
+
+export async function fundRunWithRealtime(
+  input: FundRunInput,
+): Promise<FundRunResult> {
+  const config = readPinchConfig();
+  if (config.mockMode) {
+    throw new PinchError(
+      "pinch_config_missing",
+      "Realtime run funding requires the Pinch sandbox. Disable PINCH_MOCK_MODE.",
+      503,
+    );
+  }
+
+  const accessToken = await getAccessToken(config);
+  const payerId = await upsertPayer(
+    config,
+    accessToken,
+    {
+      founderName: input.founderName,
+      founderEmail: input.founderEmail,
+    },
+    input.runId,
+  );
+
+  const sourceResponse = await providerJson(
+    `${config.apiBaseUrl}/payers/${encodeURIComponent(payerId)}/sources`,
+    {
+      method: "POST",
+      headers: authorisedHeaders(accessToken),
+      body: JSON.stringify({
+        sourceType: "credit-card",
+        token: input.token,
+      }),
+    },
+    { step: "sources.create", campaignId: input.runId },
+  );
+  const sourceRecords = candidates(sourceResponse);
+  const sourceId = readString(sourceRecords, ["id", "sourceId"]);
+  if (!sourceId) {
+    logFailure("source response missing id", shapeOf(sourceRecords));
+    throw new PinchError(
+      "pinch_source_failed",
+      "Pinch vaulted the card but did not return a reusable source ID.",
+    );
+  }
+
+  const split = calculateRunSplit(input.testerCount);
+  const amount = split.total * 100;
+  const applicationFee = split.applicationFee;
+  const paymentResponse = await providerJson(
+    `${config.apiBaseUrl}/payments/realtime`,
+    {
+      method: "POST",
+      headers: authorisedHeaders(accessToken),
+      body: JSON.stringify({
+        payerId,
+        sourceId,
+        amount,
+        applicationFee,
+        description: `Playground run ${input.runId}`,
+        nonce: input.runId,
+        metadata: JSON.stringify({
+          runId: input.runId,
+          testerCount: input.testerCount,
+          decision: input.decision,
+        }),
+      }),
+    },
+    { step: "payments.realtime", campaignId: input.runId },
+  );
+
+  const paymentRecords = candidates(paymentResponse);
+  const paymentId = readString(paymentRecords, ["id", "paymentId"]);
+  const status = readString(paymentRecords, ["status"]);
+  const returnedAmount = readNumber(paymentRecords, ["amount"]);
+  const returnedApplicationFee = readNumber(paymentRecords, [
+    "applicationFee",
+  ]);
+
+  if (!paymentId || !status || returnedAmount === null) {
+    logFailure(
+      "realtime payment response missing required fields",
+      shapeOf(paymentRecords),
+    );
+    throw new PinchError(
+      "pinch_unexpected_response",
+      "Pinch processed the request but returned an incomplete payment result.",
+    );
+  }
+
+  if (!isFundedStatus(status)) {
+    const providerCode =
+      readString(paymentRecords, ["dishonourType", "dishonourCode"]) ?? status;
+    throw new PinchProviderError(
+      providerCode,
+      `Pinch returned ${providerCode}.`,
+      402,
+    );
+  }
+
+  logStep("payments.realtime.approved", {
+    campaignId: input.runId,
+    payerId,
+    paymentId,
+  });
+
+  return {
+    payerId,
+    sourceId,
+    sourceLast4: readString(sourceRecords, [
+      "last4",
+      "displayCardNumber",
+      "cardLast4",
+      "creditCardLast4",
+    ]),
+    sourceBrand: readString(sourceRecords, [
+      "brand",
+      "cardScheme",
+      "scheme",
+      "cardBrand",
+      "creditCardType",
+    ]),
+    paymentId,
+    status,
+    amount: returnedAmount,
+    applicationFee: returnedApplicationFee ?? applicationFee,
+    sourceResponse,
+    paymentResponse,
   };
 }

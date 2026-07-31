@@ -7,6 +7,7 @@ import type {
   TesterSubmission,
 } from "@/lib/campaign/types";
 import {
+  DEMO_EARNING,
   DEMO_PROJECTS,
   DEMO_REVIEWER,
   INGEN_TASKS,
@@ -114,6 +115,7 @@ export async function seedDemoData(): Promise<void> {
       playgroundDb.reviewers,
       playgroundDb.projects,
       playgroundDb.assignments,
+      playgroundDb.earnings,
       playgroundDb.founderFindings,
     ],
     async () => {
@@ -140,6 +142,9 @@ export async function seedDemoData(): Promise<void> {
         if (!(await playgroundDb.founderFindings.get(finding.id))) {
           await playgroundDb.founderFindings.add(finding);
         }
+      }
+      if (!(await playgroundDb.earnings.get(DEMO_EARNING.id))) {
+        await playgroundDb.earnings.add(DEMO_EARNING);
       }
     },
   );
