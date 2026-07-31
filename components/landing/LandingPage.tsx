@@ -135,9 +135,6 @@ export function LandingPage() {
                   Earn as a tester →
                 </Link>
               </div>
-              <p className="landing-trust">
-                — A$199 · 5 testers · results in 24 hours
-              </p>
             </div>
 
             <article className="landing-preview">
