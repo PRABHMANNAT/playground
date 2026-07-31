@@ -137,51 +137,76 @@ export function LandingPage() {
               </div>
             </div>
 
-            <article className="landing-preview">
-              <header className="landing-split-card__header">
-                <span>PINCH · REALTIME SPLIT</span>
-                <span>CMP_001</span>
-              </header>
+            <article
+              className="landing-preview"
+              aria-label="Pinch realtime payment split. Hover to reveal Pinch Payments."
+              tabIndex={0}
+            >
+              <div className="landing-preview__flipper">
+                <div className="landing-preview__face landing-preview__face--front">
+                  <header className="landing-split-card__header">
+                    <span>PINCH · REALTIME SPLIT</span>
+                    <span>CMP_001</span>
+                  </header>
 
-              <div className="landing-split-card__fork">
-                <div className="landing-split-card__node landing-split-card__node--founder">
-                  <span>Founder</span>
-                  <strong>A$199</strong>
+                  <div className="landing-split-card__fork">
+                    <div className="landing-split-card__node landing-split-card__node--founder">
+                      <span>Founder</span>
+                      <strong>A$199</strong>
+                    </div>
+
+                    <svg
+                      className="landing-split-card__connector landing-split-card__connector--desktop"
+                      viewBox="0 0 120 150"
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                    >
+                      <path d="M0 75 H50" />
+                      <path d="M50 75 C70 75 70 35 92 35 H120" />
+                      <path d="M50 75 C70 75 70 115 92 115 H120" />
+                      <circle cx="50" cy="75" r="4" />
+                    </svg>
+
+                    <svg
+                      className="landing-split-card__connector landing-split-card__connector--mobile"
+                      viewBox="0 0 240 64"
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                    >
+                      <path d="M120 0 V22" />
+                      <path d="M120 22 C120 38 60 36 60 52 V64" />
+                      <path d="M120 22 C120 38 180 36 180 52 V64" />
+                      <circle cx="120" cy="22" r="4" />
+                    </svg>
+
+                    <div className="landing-split-card__recipients">
+                      <div className="landing-split-card__node landing-split-card__node--settled">
+                        <span>5 testers</span>
+                        <strong>A$150.00</strong>
+                      </div>
+                      <div className="landing-split-card__node landing-split-card__node--settled">
+                        <span>Playground</span>
+                        <strong>A$49.00</strong>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <svg
-                  className="landing-split-card__connector landing-split-card__connector--desktop"
-                  viewBox="0 0 120 150"
-                  preserveAspectRatio="none"
+                <div
+                  className="landing-preview__face landing-preview__face--back"
                   aria-hidden="true"
                 >
-                  <path d="M0 75 H50" />
-                  <path d="M50 75 C70 75 70 35 92 35 H120" />
-                  <path d="M50 75 C70 75 70 115 92 115 H120" />
-                  <circle cx="50" cy="75" r="4" />
-                </svg>
-
-                <svg
-                  className="landing-split-card__connector landing-split-card__connector--mobile"
-                  viewBox="0 0 240 64"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <path d="M120 0 V22" />
-                  <path d="M120 22 C120 38 60 36 60 52 V64" />
-                  <path d="M120 22 C120 38 180 36 180 52 V64" />
-                  <circle cx="120" cy="22" r="4" />
-                </svg>
-
-                <div className="landing-split-card__recipients">
-                  <div className="landing-split-card__node landing-split-card__node--settled">
-                    <span>5 testers</span>
-                    <strong>A$150.00</strong>
+                  <div className="landing-preview__pinch-glass">
+                    <Image
+                      className="landing-preview__pinch-logo"
+                      src="/pinch-payments-logo.png"
+                      alt=""
+                      width={302}
+                      height={168}
+                    />
+                    <span>PAYMENTS</span>
                   </div>
-                  <div className="landing-split-card__node landing-split-card__node--settled">
-                    <span>Playground</span>
-                    <strong>A$49.00</strong>
-                  </div>
+                  <p>REALTIME SPLIT INFRASTRUCTURE</p>
                 </div>
               </div>
             </article>
