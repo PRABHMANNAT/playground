@@ -1,10 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 import { SunsetAsciiCanvas } from "@/components/landing/SunsetAsciiCanvas";
 
 const TESTER_ENTRY = "/tester";
-const FOUNDER_ENTRY = "/founder/new";
+const FOUNDER_ENTRY = "/start";
 
 const WORKFLOW = [
   {
@@ -53,6 +56,12 @@ const WORKFLOW = [
 ];
 
 export function LandingPage() {
+  const [isPreviewFlipped, setIsPreviewFlipped] = useState(false);
+
+  const togglePreview = () => {
+    setIsPreviewFlipped((current) => !current);
+  };
+
   return (
     <div className="landing">
       <header className="landing-nav">
@@ -72,9 +81,25 @@ export function LandingPage() {
             </span>
             <span className="landing-brand__word">Playground</span>
           </Link>
-          <span className="landing-brand__powered" aria-label="Powered by PinchPayments">
-            <span>Powered by</span>
-            <strong>PinchPayments</strong>
+          <span
+            className="landing-brand__powered"
+            aria-label="Powered by PinchPayments"
+          >
+            <span
+              className="landing-pinch-mark landing-pinch-mark--nav"
+              aria-hidden="true"
+            >
+              <Image
+                src="/pinch-payments-logo.png"
+                alt=""
+                width={496}
+                height={200}
+              />
+            </span>
+            <span className="landing-brand__powered-copy">
+              <span>Powered by</span>
+              <strong>PinchPayments</strong>
+            </span>
           </span>
           <div className="landing-nav__links">
             <a
@@ -116,10 +141,6 @@ export function LandingPage() {
                 <br />
                 your runway.
               </h1>
-              <p className="landing-hero__lede landing-hero__pillars">
-                Pre-screen the product | Fund validation through Pinch | Reach
-                founding users and audience
-              </p>
               <div className="landing-hero__actions">
                 <Link
                   className="landing-btn landing-btn--primary landing-btn--hero"
@@ -137,8 +158,17 @@ export function LandingPage() {
             </div>
 
             <article
-              className="landing-preview"
-              aria-label="Pinch realtime payment split. Hover to reveal Pinch Payments."
+              className={`landing-preview${isPreviewFlipped ? " landing-preview--flipped" : ""}`}
+              aria-label="Pinch realtime payment split. Activate to toggle Pinch Payments."
+              aria-pressed={isPreviewFlipped}
+              onClick={togglePreview}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  togglePreview();
+                }
+              }}
+              role="button"
               tabIndex={0}
             >
               <div className="landing-preview__flipper">
@@ -234,7 +264,21 @@ export function LandingPage() {
                   <span className="landing-flow__index" aria-hidden="true">
                     {step.number}
                   </span>
-                  <i className="landing-flow__dot" aria-hidden="true" />
+                  {step.pinch ? (
+                    <span
+                      className="landing-pinch-mark landing-pinch-mark--rail"
+                      aria-hidden="true"
+                    >
+                      <Image
+                        src="/pinch-payments-logo.png"
+                        alt=""
+                        width={496}
+                        height={200}
+                      />
+                    </span>
+                  ) : (
+                    <i className="landing-flow__dot" aria-hidden="true" />
+                  )}
                 </div>
                 <div className="landing-flow__content">
                   <strong className="landing-flow__label">

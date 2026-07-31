@@ -137,9 +137,10 @@
 }
 
 .landing-brand__powered {
-  display: grid;
+  display: flex;
   min-width: 104px;
-  gap: 1px;
+  align-items: center;
+  gap: 7px;
   padding-left: 14px;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.58);
@@ -149,11 +150,40 @@
   text-transform: uppercase;
 }
 
+.landing-brand__powered-copy {
+  display: grid;
+  gap: 1px;
+}
+
 .landing-brand__powered strong {
   color: rgba(255, 255, 255, 0.9);
   font-size: 9px;
   font-weight: 760;
   letter-spacing: 0.015em;
+}
+
+.landing-pinch-mark {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.landing-pinch-mark img {
+  position: absolute;
+  max-width: none;
+}
+
+.landing-pinch-mark--nav {
+  width: 18px;
+  height: 18px;
+}
+
+.landing-pinch-mark--nav img {
+  top: -15px;
+  left: -18px;
+  width: 109px;
+  height: 44px;
 }
 
 .landing-nav__links {
@@ -377,14 +407,6 @@
   text-shadow: 0 3px 32px rgba(0, 0, 0, 0.35);
 }
 
-.landing-hero__lede {
-  max-width: 50ch;
-  margin: 22px 0 0;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: clamp(15px, 1.35vw, 17px);
-  line-height: 1.6;
-}
-
 .landing-hero__pillars {
   max-width: 58ch;
   color: rgba(255, 255, 255, 0.76);
@@ -461,12 +483,12 @@
 
 .landing-preview__flipper {
   position: relative;
+  transition: transform 560ms cubic-bezier(0.22, 0.8, 0.24, 1);
   transform-style: preserve-3d;
 }
 
-.landing-preview:hover .landing-preview__flipper,
-.landing-preview:focus-visible .landing-preview__flipper {
-  animation: landing-preview-flip 1s ease-in-out both;
+.landing-preview--flipped .landing-preview__flipper {
+  transform: rotateY(180deg);
 }
 
 .landing-preview:focus-visible {
@@ -546,21 +568,6 @@
 .landing-preview__face--back > p {
   margin: 0;
   color: rgba(255, 255, 255, 0.54);
-}
-
-@keyframes landing-preview-flip {
-  0% {
-    transform: rotateY(0deg);
-  }
-
-  35%,
-  68% {
-    transform: rotateY(180deg);
-  }
-
-  100% {
-    transform: rotateY(360deg);
-  }
 }
 
 .landing-preview::before {
@@ -993,6 +1000,20 @@
   background: #de7356;
 }
 
+.landing-pinch-mark--rail {
+  width: 14px;
+  height: 14px;
+  margin: -2.5px 0;
+  filter: drop-shadow(0 0 6px rgba(255, 94, 90, 0.45));
+}
+
+.landing-pinch-mark--rail img {
+  top: -11px;
+  left: -14px;
+  width: 84px;
+  height: 34px;
+}
+
 .landing-flow__content {
   margin-top: 15px;
   padding-right: 8px;
@@ -1206,12 +1227,6 @@
 
   .landing-hero__actions .landing-btn {
     flex: 1 1 100%;
-  }
-
-  .landing-hero__lede {
-    margin-top: 14px;
-    font-size: 13px;
-    line-height: 1.45;
   }
 
   .landing-hero__actions {
