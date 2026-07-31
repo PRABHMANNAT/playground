@@ -116,10 +116,9 @@ export function LandingPage() {
                 <br />
                 your runway.
               </h1>
-              <p className="landing-hero__lede">
-                Paste your link. Fund a campaign through Pinch. Five matched
-                Australian users test it — you get three fixes and a Ship /
-                Modify / Kill call.
+              <p className="landing-hero__lede landing-hero__pillars">
+                Pre-screen the product | Fund validation through Pinch | Reach
+                founding users and audience
               </p>
               <div className="landing-hero__actions">
                 <Link
@@ -213,10 +212,9 @@ export function LandingPage() {
 
             <div className="landing-hero__reveal">
               <h2>Meet people who already have the problem.</h2>
-              <p>
-                Matched Australian testers, not a survey panel. Every tester is
-                a verified Pinch merchant — which is why they get paid in one
-                call, and why fake reviewers can&apos;t get paid at all.
+              <p className="landing-hero__pillars">
+                Pre-screen the product | Fund validation through Pinch | Reach
+                founding users and audience
               </p>
             </div>
           </div>
