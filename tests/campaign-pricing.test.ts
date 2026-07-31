@@ -39,7 +39,7 @@ test("only one package exists and it matches the brief", () => {
   assert.deepEqual(FIRST_FIVE_PACKAGE.includes, [
     "AI Scout product analysis",
     "Five matched users",
-    "Structured tester missions",
+    "Structured tester tasks",
     "Written or Loom evidence",
     "Three recommended fixes",
     "Ship, Modify or Kill verdict",

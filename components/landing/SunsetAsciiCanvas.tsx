@@ -444,7 +444,7 @@ export function SunsetAsciiCanvas() {
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
       context.clearRect(0, 0, width, height);
       context.globalAlpha = PRESET.bgOpacity / 100;
-      context.fillStyle = "#0c0504";
+      context.fillStyle = "#f5f8fc";
       context.fillRect(0, 0, width, height);
       context.globalAlpha = 1;
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -502,7 +502,7 @@ export function SunsetAsciiCanvas() {
         context.save();
         context.globalAlpha =
           mapReveal * (AUSTRALIA_PRESET.scanLines / 100) * 0.28;
-        context.fillStyle = "#020101";
+        context.fillStyle = "#c7d2e2";
         for (let y = 1; y < height; y += 4) {
           context.fillRect(0, y, width, 1);
         }
@@ -516,10 +516,10 @@ export function SunsetAsciiCanvas() {
         height * 0.46,
         Math.max(width, height) * 0.72,
       );
-      vignette.addColorStop(0, "rgb(0 0 0 / 0)");
+      vignette.addColorStop(0, "rgb(67 88 122 / 0)");
       vignette.addColorStop(
         1,
-        `rgb(0 0 0 / ${PRESET.vignette / 100})`,
+        `rgb(67 88 122 / ${(PRESET.vignette / 100) * 0.14})`,
       );
       context.fillStyle = vignette;
       context.fillRect(0, 0, width, height);

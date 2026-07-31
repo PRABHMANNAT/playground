@@ -18,7 +18,7 @@ export const FIRST_FIVE_PACKAGE: CampaignPackage = {
   includes: [
     "AI Scout product analysis",
     "Five matched users",
-    "Structured tester missions",
+    "Structured tester tasks",
     "Written or Loom evidence",
     "Three recommended fixes",
     "Ship, Modify or Kill verdict",

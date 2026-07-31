@@ -122,7 +122,7 @@ function ResultsLoading() {
   return (
     <div className="cw-results-loading" aria-live="polite">
       <span className="cw-spinner" aria-hidden="true" />
-      <strong>Organising campaign evidence…</strong>
+      <strong>Organising validation run evidence…</strong>
       <p>Combining the live demo submission with clearly labelled demo data.</p>
     </div>
   );
@@ -181,7 +181,7 @@ export function CampaignResultsHandoff({
             <span aria-hidden="true">P</span>
             Playground
           </Link>
-          <span className="cw-results__campaign">Campaign {campaignId}</span>
+          <span className="cw-results__campaign">Validation run {campaignId}</span>
         </header>
         <ResultsLoading />
       </main>
@@ -197,7 +197,7 @@ export function CampaignResultsHandoff({
             Playground
           </Link>
           <div className="cw-results-nav">
-            <span>Campaign {campaignId}</span>
+            <span>Validation run {campaignId}</span>
             <strong>Awaiting live evidence</strong>
           </div>
         </header>
@@ -214,7 +214,7 @@ export function CampaignResultsHandoff({
               className="cw-primary-action"
               href={`/tester/campaigns/${campaignId}`}
             >
-              Open tester mission <span aria-hidden="true">→</span>
+              Open tester tasks <span aria-hidden="true">→</span>
             </Link>
           </section>
         </div>
@@ -230,7 +230,7 @@ export function CampaignResultsHandoff({
           Playground
         </Link>
         <div className="cw-results-nav">
-          <span>Campaign {campaignId}</span>
+          <span>Validation run {campaignId}</span>
           <strong>
             {resultsReady ? "Results ready" : "Awaiting live evidence"}
           </strong>
@@ -283,7 +283,7 @@ export function CampaignResultsHandoff({
             </div>
             <div>
               <dd>A$199</dd>
-              <dt>campaign funding</dt>
+              <dt>run funding</dt>
               <small>Funded through Pinch</small>
             </div>
           </dl>
@@ -297,7 +297,7 @@ export function CampaignResultsHandoff({
               presented as real testers.
             </span>
             <Link href={`/tester/campaigns/${campaignId}`}>
-              Complete tester mission
+              Complete tester tasks
             </Link>
           </div>
         ) : null}
@@ -584,7 +584,7 @@ export function CampaignResultsHandoff({
           <div className="cw-ledger-layout">
             <dl className="cw-ledger-money">
               <div>
-                <dt>Campaign funding</dt>
+                <dt>Validation run funding</dt>
                 <dd>A$199</dd>
               </div>
               <div>
@@ -614,7 +614,7 @@ export function CampaignResultsHandoff({
                 <dd>{paymentId}</dd>
               </div>
               <div>
-                <dt>Campaign status</dt>
+                <dt>Run status</dt>
                 <dd className="cw-results-ready">
                   {resultsReady ? "Results ready" : "Awaiting live evidence"}
                 </dd>
@@ -639,7 +639,7 @@ export function CampaignResultsHandoff({
               className="cw-primary-action"
               href={`/campaigns/${campaignId}/founding-users`}
             >
-              Launch founding-user campaign <span aria-hidden="true">→</span>
+              Launch founding-user run <span aria-hidden="true">→</span>
             </Link>
           </div>
         </footer>

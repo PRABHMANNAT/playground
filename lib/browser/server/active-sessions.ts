@@ -238,6 +238,45 @@ export async function refreshVisitedScreens(
   }
 }
 
+export async function captureActiveBrowser(
+  sessionId: string,
+): Promise<{
+  dataUrl: string;
+  title: string;
+  url: string;
+  width: number;
+  height: number;
+} | null> {
+  const entry = activeBrowsers.get(sessionId);
+  if (!entry) {
+    return null;
+  }
+
+  const page = selectCurrentPage(entry.browser);
+  if (!page) {
+    return null;
+  }
+
+  const viewport = page.viewportSize() ?? { width: 1_440, height: 900 };
+  const [buffer, title] = await Promise.all([
+    page.screenshot({
+      type: "jpeg",
+      quality: 82,
+      fullPage: false,
+      animations: "disabled",
+    }),
+    page.title().catch(() => ""),
+  ]);
+
+  return {
+    dataUrl: `data:image/jpeg;base64,${buffer.toString("base64")}`,
+    title: title || "Product screen",
+    url: safePublicUrl(page.url()),
+    width: viewport.width,
+    height: viewport.height,
+  };
+}
+
 export async function closeActiveBrowser(sessionId: string): Promise<void> {
   const entry = activeBrowsers.get(sessionId);
   activeBrowsers.delete(sessionId);

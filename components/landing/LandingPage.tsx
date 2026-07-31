@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { SunsetAsciiCanvas } from "@/components/landing/SunsetAsciiCanvas";
+import { RoleNavigation } from "@/components/navigation/RoleNavigation";
 
-const TESTER_ENTRY = "/tester";
-const FOUNDER_ENTRY = "/start";
+const TESTER_ENTRY = "/start?role=tester";
+const FOUNDER_ENTRY = "/start?role=founder";
 
 const WORKFLOW = [
   {
@@ -54,6 +55,99 @@ const WORKFLOW = [
     copy: "Funds land in the tester's bank account",
   },
 ];
+
+function PinchSplitPreview({
+  flipped,
+  onToggle,
+}: {
+  flipped: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <article
+      className={`landing-preview${flipped ? " landing-preview--flipped" : ""}`}
+      aria-label="Pinch realtime payment split. Activate to toggle Pinch Payments."
+      aria-pressed={flipped}
+      onClick={onToggle}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onToggle();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="landing-preview__flipper">
+        <div className="landing-preview__face landing-preview__face--front">
+          <header className="landing-split-card__header">
+            <span>PINCH · REALTIME SPLIT</span>
+            <span>CMP_001</span>
+          </header>
+
+          <div className="landing-split-card__fork">
+            <div className="landing-split-card__node landing-split-card__node--founder">
+              <span>Founder</span>
+              <strong>A$199</strong>
+            </div>
+
+            <svg
+              className="landing-split-card__connector landing-split-card__connector--desktop"
+              viewBox="0 0 120 150"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path d="M0 75 H50" />
+              <path d="M50 75 C70 75 70 35 92 35 H120" />
+              <path d="M50 75 C70 75 70 115 92 115 H120" />
+              <circle cx="50" cy="75" r="4" />
+            </svg>
+
+            <svg
+              className="landing-split-card__connector landing-split-card__connector--mobile"
+              viewBox="0 0 240 64"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path d="M120 0 V22" />
+              <path d="M120 22 C120 38 60 36 60 52 V64" />
+              <path d="M120 22 C120 38 180 36 180 52 V64" />
+              <circle cx="120" cy="22" r="4" />
+            </svg>
+
+            <div className="landing-split-card__recipients">
+              <div className="landing-split-card__node landing-split-card__node--settled">
+                <span>5 testers</span>
+                <strong>A$150.00</strong>
+              </div>
+              <div className="landing-split-card__node landing-split-card__node--settled">
+                <span>Playground</span>
+                <strong>A$49.00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="landing-preview__face landing-preview__face--back"
+          aria-hidden="true"
+        >
+          <div className="landing-preview__pinch-glass">
+            <Image
+              className="landing-preview__pinch-logo"
+              src="/pinch-payments-logo.png"
+              alt=""
+              width={302}
+              height={168}
+            />
+            <span>PAYMENTS</span>
+          </div>
+          <p>REALTIME SPLIT INFRASTRUCTURE</p>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export function LandingPage() {
   const [isPreviewFlipped, setIsPreviewFlipped] = useState(false);
@@ -109,19 +203,48 @@ export function LandingPage() {
               How it works
             </a>
             <a className="landing-nav__link" href="#founding-users">
-              For founding users
+              For testers
             </a>
           </div>
-          <Link
-            className="landing-btn landing-btn--primary landing-btn--nav"
-            href={FOUNDER_ENTRY}
-          >
-            Launch validation
-          </Link>
+          <RoleNavigation variant="landing" />
         </nav>
       </header>
 
       <main>
+        <section className="landing-api-hero" aria-labelledby="api-hero-title">
+          <div className="landing-shell landing-api-hero__frame">
+            <div className="landing-api-hero__copy">
+              <p>PRODUCT VALIDATION · PROGRAMMED</p>
+              <h1 id="api-hero-title">
+                <span>Give your product access to the</span>
+                <mark>real world.</mark>
+              </h1>
+              <h2>
+                Playground makes product validation as reliable and
+                programmable as the APIs behind it.
+              </h2>
+              <div className="landing-api-hero__actions">
+                <Link
+                  className="landing-api-hero__primary"
+                  href={FOUNDER_ENTRY}
+                >
+                  Validate my product <span aria-hidden="true">›</span>
+                </Link>
+                <Link
+                  className="landing-api-hero__secondary"
+                  href={TESTER_ENTRY}
+                >
+                  Get paid to test <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </div>
+            <PinchSplitPreview
+              flipped={isPreviewFlipped}
+              onToggle={togglePreview}
+            />
+          </div>
+        </section>
+
         <section className="landing-hero">
           <SunsetAsciiCanvas />
           <span
@@ -130,7 +253,7 @@ export function LandingPage() {
             aria-hidden="true"
           />
           <div className="landing-shell landing-hero__inner">
-            <div className="landing-hero__copy">
+            <div className="landing-hero__copy" hidden>
               <p className="landing-eyebrow">
                 SPLIT PAYMENTS BY PINCH · MATCHED AUSTRALIAN TESTERS
               </p>
@@ -146,18 +269,19 @@ export function LandingPage() {
                   className="landing-btn landing-btn--primary landing-btn--hero"
                   href={FOUNDER_ENTRY}
                 >
-                  Launch a validation
+                  Validate my product
                 </Link>
                 <Link
                   className="landing-hero__tester-link"
                   href={TESTER_ENTRY}
                 >
-                  Earn as a tester →
+                  Get paid to test →
                 </Link>
               </div>
             </div>
 
             <article
+              hidden
               className={`landing-preview${isPreviewFlipped ? " landing-preview--flipped" : ""}`}
               aria-label="Pinch realtime payment split. Activate to toggle Pinch Payments."
               aria-pressed={isPreviewFlipped}

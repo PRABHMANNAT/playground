@@ -2,6 +2,14 @@
    convention as product.css so the marketing surface and the product
    surface stay one visual system. */
 
+@font-face {
+  font-family: "GT Planar";
+  src: url("/fonts/gt-planar-medium.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500 800;
+}
+
 .landing {
   --landing-canvas: #f6f1e8;
   --landing-surface: #fffdf8;
@@ -294,6 +302,168 @@
   font-size: 15px;
 }
 
+/* Browserbase-inspired opening canvas */
+
+.landing-api-hero {
+  position: relative;
+  padding-top: 92px;
+  background: #f9fbff;
+}
+
+.landing-api-hero__frame {
+  /* Hero artwork. Swap this one line to change the background image —
+     nothing else in the hero references it. */
+  --api-hero-image: url("/landing-hero-bg.png");
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(480px, 1.04fr);
+  min-height: min(680px, 92svh);
+  align-items: center;
+  gap: 34px;
+  overflow: hidden;
+  border: 1px solid #b9c9df;
+  /* Sky tone behind the artwork, so the hero still reads as intentional
+     while the image loads or if it is missing. */
+  background: var(--api-hero-image) center bottom / cover no-repeat, #bcd2ea;
+}
+
+.landing-api-hero__copy {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: start;
+  padding: clamp(76px, 8vw, 104px) 0 74px clamp(30px, 4vw, 62px);
+  text-align: left;
+}
+
+.landing-api-hero__copy > p {
+  margin: 0 0 18px;
+  color: #25324a;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: 0.13em;
+}
+
+.landing-api-hero h1 {
+  display: grid;
+  max-width: 530px;
+  justify-items: start;
+  margin: 0;
+  color: #fff;
+  font-family: "GT Planar", var(--font-geist-sans), Arial, sans-serif;
+  font-size: clamp(39px, 4.7vw, 58px);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.landing-api-hero h1 span,
+.landing-api-hero h1 mark {
+  width: fit-content;
+  padding: 4px 12px 7px;
+  background: #ff4b11;
+  color: #fff;
+}
+
+.landing-api-hero h1 mark {
+  margin-top: -1px;
+  border: 0;
+}
+
+.landing-api-hero h2 {
+  max-width: 500px;
+  margin: 32px 0 0;
+  color: #101214;
+  font-family: "GT Planar", var(--font-geist-sans), Arial, sans-serif;
+  font-size: clamp(18px, 2vw, 23px);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.landing-api-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 9px;
+  margin-top: 26px;
+}
+
+.landing-api-hero__primary,
+.landing-api-hero__secondary {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 19px;
+  border: 1px solid #0a0a0a;
+  border-radius: 999px;
+  font-family: "GT Planar", var(--font-geist-sans), Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.landing-api-hero__primary {
+  background: #090909;
+  color: #fff;
+}
+
+.landing-api-hero__primary:hover {
+  background: #292929;
+}
+
+.landing-api-hero__secondary {
+  border-color: #c7d2e3;
+  background: rgba(255, 255, 255, 0.68);
+  color: #13171e;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.landing-api-hero__secondary:hover {
+  border-color: #889bb9;
+  background: #fff;
+}
+
+.landing-api-hero__actions span {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 0;
+}
+
+/* Keeps the left-hand copy readable over the artwork. */
+.landing-api-hero__frame::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(247, 251, 255, 0.9) 0%,
+      rgba(247, 251, 255, 0.62) 34%,
+      rgba(247, 251, 255, 0) 62%
+    );
+  content: "";
+  pointer-events: none;
+}
+
+.landing-api-hero .landing-preview {
+  z-index: 3;
+  width: calc(100% - 42px);
+  max-width: 560px;
+  margin-right: 42px;
+  justify-self: end;
+  opacity: 1;
+  transform: none;
+}
+
 /* Hero */
 
 .landing-hero {
@@ -309,8 +479,11 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  height: 175svh;
-  min-height: 1060px;
+  /* The inner block is 100svh and sticks; the remainder is the scroll
+     distance the reveal animates over. 125svh leaves enough travel for the
+     reveal without the long empty gap 175svh created. */
+  height: 125svh;
+  min-height: 860px;
   background: #0c0504;
   color: #fff;
 }
@@ -1050,6 +1223,178 @@
   }
 }
 
+/* Light landing system */
+
+.landing {
+  --landing-canvas: #f9fbff;
+  --landing-surface: #fff;
+  --landing-ink: #111317;
+  --landing-muted: #566175;
+  --landing-subtle: #647187;
+  --landing-line: #cbd6e5;
+  --landing-line-strong: #aebed3;
+  background: var(--landing-canvas);
+  color: var(--landing-ink);
+}
+
+.landing::before {
+  background:
+    linear-gradient(rgba(122, 151, 193, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 151, 193, 0.18) 1px, transparent 1px);
+  background-size: 88px 88px;
+}
+
+.landing > main {
+  background: #f9fbff;
+}
+
+.landing-nav__inner {
+  border-color: rgba(126, 146, 177, 0.38);
+  background:
+    radial-gradient(
+      360px 80px at 18% -30%,
+      rgba(255, 255, 255, 0.98),
+      transparent 66%
+    ),
+    linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(245, 248, 253, 0.72)
+    );
+  box-shadow:
+    0 16px 42px -28px rgba(39, 57, 85, 0.4),
+    inset 0 1px 0 #fff;
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+}
+
+.landing-nav__inner::before {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 14px 3px rgba(255, 255, 255, 0.5);
+}
+
+.landing-brand {
+  color: #111317;
+}
+
+.landing-brand__mark img {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+}
+
+.landing-brand__powered {
+  border-left-color: rgba(50, 65, 88, 0.17);
+  color: #69758a;
+}
+
+.landing-brand__powered strong {
+  color: #1c222c;
+}
+
+.landing-nav__link {
+  color: #4d596c;
+}
+
+.landing-nav__link:hover {
+  background: rgba(37, 63, 100, 0.07);
+  color: #080a0d;
+}
+
+.landing-btn--primary.landing-btn--nav {
+  border-color: #0b0b0b;
+  background: #0b0b0b;
+  color: #fff;
+}
+
+.landing-btn--primary.landing-btn--nav:hover {
+  background: #292929;
+  color: #fff;
+}
+
+.landing-hero {
+  background: #f9fbff;
+  color: #101216;
+}
+
+.landing-hero::after {
+  background: rgba(249, 251, 255, 0.08);
+}
+
+.landing-eyebrow {
+  color: #a44225;
+}
+
+.landing-hero h1,
+.landing-hero__reveal h2 {
+  color: #111317;
+  font-family: "GT Planar", var(--font-geist-sans), Arial, sans-serif;
+  text-shadow: none;
+}
+
+.landing-hero__pillars,
+.landing-hero__tester-link {
+  color: #586477;
+}
+
+.landing-hero__tester-link:hover {
+  color: #080a0d;
+}
+
+.landing-preview {
+  border-color: rgba(19, 29, 44, 0.28);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.38) inset,
+    0 26px 64px -38px rgba(24, 39, 62, 0.54);
+}
+
+.landing-flow {
+  border-color: rgba(113, 135, 168, 0.42);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 24px 64px -38px rgba(42, 62, 94, 0.38);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+
+.landing-flow::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.96),
+    transparent
+  );
+}
+
+.landing-flow__eyebrow,
+.landing-flow__index {
+  color: #56647b;
+}
+
+.landing-flow li::after {
+  background: rgba(78, 101, 136, 0.34);
+}
+
+.landing-flow__dot {
+  border-color: #7588a6;
+  background: #f8fbff;
+}
+
+.landing-flow__label {
+  color: #111317;
+  font-family: "GT Planar", var(--font-geist-sans), Arial, sans-serif;
+}
+
+.landing-flow__copy {
+  color: #5f6c80;
+}
+
+@supports not (backdrop-filter: blur(18px)) {
+  .landing-flow {
+    background: rgba(255, 255, 255, 0.96);
+  }
+}
+
 /* Responsive */
 
 @media (max-width: 1100px) {
@@ -1147,6 +1492,24 @@
 }
 
 @media (max-width: 1000px) {
+  .landing-api-hero__frame {
+    grid-template-columns: minmax(0, 0.9fr) minmax(390px, 1.1fr);
+    gap: 20px;
+  }
+
+  .landing-api-hero__copy {
+    padding-left: 30px;
+  }
+
+  .landing-api-hero h1 {
+    font-size: clamp(36px, 5vw, 48px);
+  }
+
+  .landing-api-hero .landing-preview {
+    width: calc(100% - 24px);
+    margin-right: 24px;
+  }
+
   .landing-hero__inner {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: 32px;
@@ -1206,6 +1569,67 @@
     min-height: 38px;
     padding: 0 11px;
     font-size: 11px;
+  }
+
+  .landing-api-hero {
+    padding-top: 78px;
+  }
+
+  .landing-api-hero__frame {
+    width: calc(100% - 20px);
+    min-height: 920px;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 24px;
+  }
+
+  .landing-api-hero__copy {
+    justify-items: center;
+    padding: 62px 14px 0;
+    text-align: center;
+  }
+
+  .landing-api-hero__copy > p {
+    margin-bottom: 14px;
+    font-size: 8px;
+  }
+
+  .landing-api-hero h1 {
+    justify-items: center;
+    font-size: clamp(34px, 10.5vw, 47px);
+  }
+
+  .landing-api-hero h1 span,
+  .landing-api-hero h1 mark {
+    padding: 4px 8px 6px;
+  }
+
+  .landing-api-hero h2 {
+    max-width: 30ch;
+    margin-top: 24px;
+    font-size: 17px;
+  }
+
+  .landing-api-hero__actions {
+    width: min(320px, 100%);
+  }
+
+  .landing-api-hero__primary,
+  .landing-api-hero__secondary {
+    width: 100%;
+  }
+
+  .landing-api-hero .landing-preview {
+    width: calc(100% - 28px);
+    margin: 0 auto 28px;
+    justify-self: center;
+  }
+
+  .landing-api-hero__shape--one {
+    top: 22px;
+    right: 0;
+    width: 80px;
+    height: 14px;
   }
 
   .landing-hero {

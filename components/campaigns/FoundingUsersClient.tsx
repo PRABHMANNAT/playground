@@ -91,7 +91,7 @@ export function FoundingUsersClient({
           Playground
         </Link>
         <div className="cw-activation-nav">
-          <span>Campaign {campaignId}</span>
+          <span>Validation run {campaignId}</span>
           <strong>Prototype activation ledger</strong>
         </div>
       </header>
@@ -109,7 +109,7 @@ export function FoundingUsersClient({
             </p>
           </div>
           <aside className="cw-target-card">
-            <span>Campaign target</span>
+            <span>Validation run target</span>
             <strong>10</strong>
             <p>
               recruiters who currently screen more than 30 candidates each
@@ -123,7 +123,7 @@ export function FoundingUsersClient({
           <p>
             <strong>Automated Pinch payouts are roadmap functionality.</strong>
             Automated Pinch tester and referral payouts are roadmap
-            functionality. Campaign funding is collected through Pinch; reward
+            functionality. Validation run funding is collected through Pinch; reward
             approval is currently manual.
           </p>
         </div>
@@ -249,7 +249,7 @@ export function FoundingUsersClient({
           <aside className="cw-funding-card">
             <header>
               <span className="cw-live-dot" aria-hidden="true" />
-              Campaign funded through Pinch
+              Validation run funded through Pinch
             </header>
             <dl>
               <div>
@@ -279,7 +279,7 @@ export function FoundingUsersClient({
             problem, then rewards verified adoption instead of fake activity.
           </p>
           <Link href={`/campaigns/${campaignId}/results`}>
-            Return to campaign results <span aria-hidden="true">→</span>
+            Return to run results <span aria-hidden="true">→</span>
           </Link>
         </section>
       </div>

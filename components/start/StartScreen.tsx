@@ -15,14 +15,16 @@ const ROLE_DETAILS = {
     meta: "A$199 · 5 testers · results in 24 hours",
     terminal: "> initialising founder workspace",
     destination: "/founder/new",
+    cta: "Start a validation →",
   },
   tester: {
     eyebrow: "TESTER",
     heading: "I'm a tester",
     subheading: "Get paid to test real products",
     meta: "A$30 per approved review · paid via Pinch",
-    terminal: "> loading available campaigns",
+    terminal: "> loading available validation runs",
     destination: "/tester",
+    cta: "Find work →",
   },
 } as const;
 
@@ -48,6 +50,16 @@ export function StartScreen() {
     setTypingComplete(false);
     setActiveRole(role);
   };
+
+  useEffect(() => {
+    const requestedRole = new URLSearchParams(window.location.search).get(
+      "role",
+    );
+    if (requestedRole === "founder" || requestedRole === "tester") {
+      const timer = window.setTimeout(() => setActiveRole(requestedRole), 0);
+      return () => window.clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     if (!activeRole) {
@@ -109,6 +121,7 @@ export function StartScreen() {
     } catch {
       // Demo entry still proceeds if browser storage is unavailable.
     }
+    document.cookie = `playground_role=${activeRole}; Path=/; Max-Age=2592000; SameSite=Lax`;
 
     router.push(ROLE_DETAILS[activeRole].destination);
   };
@@ -135,7 +148,7 @@ export function StartScreen() {
                 <span className={styles.heading}>{detail.heading}</span>
                 <span className={styles.subheading}>{detail.subheading}</span>
                 <span className={styles.meta}>{detail.meta}</span>
-                <span className={styles.continue}>Continue →</span>
+                <span className={styles.continue}>{detail.cta}</span>
               </span>
             </button>
           );

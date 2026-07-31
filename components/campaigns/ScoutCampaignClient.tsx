@@ -13,11 +13,11 @@ const PRODUCT_URL = "https://www.ingenworkspace.com";
 
 const ACTIVITY = [
   ["Payment approved", "10:42:07"],
-  ["Campaign funded", "10:42:08"],
+  ["Validation run funded", "10:42:08"],
   ["Scout started", "10:42:10"],
   ["Product structure captured", "10:42:13"],
-  ["Validation mission generated", "10:42:15"],
-  ["Tester mission released", "10:42:18"],
+  ["Validation tasks generated", "10:42:15"],
+  ["Tester tasks released", "10:42:18"],
 ] as const;
 
 const TESTER_TASKS = [
@@ -142,10 +142,10 @@ export function ScoutCampaignClient({
         <div className="cw-topbar__status">
           <span className="cw-live-dot" aria-hidden="true" />
           {campaign === undefined
-            ? "Loading campaign…"
+            ? "Loading validation run…"
             : campaignIsActive
-              ? "Funded through Pinch · Campaign active"
-              : "Campaign not active"}
+              ? "Funded through Pinch · Validation run active"
+              : "Validation run not active"}
         </div>
       </header>
 
@@ -156,8 +156,8 @@ export function ScoutCampaignClient({
             <h1>Pinch starts the work.</h1>
             <p>
               {campaignIsActive
-                ? "Payment has activated a live validation campaign. Scout is turning the authorised product into a focused tester mission."
-                : "Scout will start only after Playground verifies the Pinch payment and activates this campaign."}
+                ? "Payment has activated a live validation run. Scout is turning the authorised product into focused tester tasks."
+                : "Scout will start only after Playground verifies the Pinch payment and activates this validation run."}
             </p>
           </div>
           <div className="cw-hero__actions">
@@ -178,8 +178,8 @@ export function ScoutCampaignClient({
               }
             >
               {campaignIsActive
-                ? "Open tester mission"
-                : "Activate campaign first"}{" "}
+                ? "Open tester tasks"
+                : "Activate validation run first"}{" "}
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -187,7 +187,7 @@ export function ScoutCampaignClient({
 
         <dl className="cw-metadata">
           <div>
-            <dt>Campaign ID</dt>
+            <dt>Validation run ID</dt>
             <dd>{campaignId}</dd>
           </div>
           <div>
@@ -310,7 +310,7 @@ export function ScoutCampaignClient({
               <div className="cw-section__heading">
                 <div>
                   <span className="cw-section__index">03</span>
-                  <h2>Generated validation mission</h2>
+                  <h2>Generated validation tasks</h2>
                 </div>
                 <span className="cw-ai-label">
                   AI-generated prototype analysis
@@ -402,7 +402,7 @@ export function ScoutCampaignClient({
             <header>
               <div>
                 <p className="cw-kicker">Pinch event</p>
-                <h2 id="payment-event-title">Campaign activation</h2>
+                <h2 id="payment-event-title">Validation run activation</h2>
               </div>
               <button
                 aria-label="Close payment event"
@@ -429,7 +429,7 @@ export function ScoutCampaignClient({
                 <dd>Approved</dd>
               </div>
               <div>
-                <dt>Campaign activated</dt>
+                <dt>Validation run activated</dt>
                 <dd>{activationTime}</dd>
               </div>
             </dl>

@@ -22,8 +22,8 @@ const IN_PROGRESS_STATUSES = new Set([
 
 const TIMELINE = [
   "Payment approved",
-  "Campaign funded",
-  "Campaign activated",
+  "Validation run funded",
+  "Validation run activated",
   "Scout ready",
 ];
 
@@ -68,7 +68,7 @@ export function PaymentReturn() {
       if (!response.ok || "error" in payload) {
         setMessage(
           "error" in payload
-            ? payload.error.message
+            ? payload.error.message.replace(/campaign/gi, "validation run")
             : "Playground could not verify this payment.",
         );
         setState("failed");
@@ -80,8 +80,8 @@ export function PaymentReturn() {
       if (!payload.verified) {
         setMessage(
           IN_PROGRESS_STATUSES.has(payload.status)
-            ? "Pinch has not finished processing this payment yet. The campaign stays in payment_pending until it does."
-            : "Pinch did not approve this payment, so the campaign was not activated.",
+            ? "Pinch has not finished processing this payment yet. The validation run stays in payment_pending until it does."
+            : "Pinch did not approve this payment, so the validation run was not activated.",
         );
         setState(IN_PROGRESS_STATUSES.has(payload.status) ? "pending" : "failed");
         return;
@@ -102,7 +102,7 @@ export function PaymentReturn() {
 
       if (!activation.activated) {
         setMessage(
-          `Payment is approved, but the campaign could not be activated in this browser. ${activation.reason ?? ""}`.trim(),
+          `Payment is approved, but the validation run could not be activated in this browser. ${activation.reason ?? ""}`.trim(),
         );
         setState("failed");
         return;
@@ -154,7 +154,7 @@ export function PaymentReturn() {
         </p>
         <div className="pay-actions">
           <Link className="pay-btn pay-btn--secondary" href="/founder/new">
-            Return to campaign
+            Return to validation run
           </Link>
         </div>
       </div>
@@ -170,11 +170,11 @@ export function PaymentReturn() {
         >
           {pending ? result?.status ?? "Processing" : result?.status ?? "Not approved"}
         </span>
-        <h1>{pending ? "Payment still processing" : "Campaign not funded"}</h1>
+        <h1>{pending ? "Payment still processing" : "Validation run not funded"}</h1>
         <p className="pay-muted">{message}</p>
 
         <p className="pay-note">
-          Campaign <strong>{campaignId}</strong> has not been activated.
+          Validation run <strong>{campaignId}</strong> has not been activated.
         </p>
 
         {result ? (
@@ -207,7 +207,7 @@ export function PaymentReturn() {
             Check payment again
           </button>
           <Link className="pay-btn pay-btn--secondary" href="/founder/new">
-            Return to campaign
+            Return to validation run
           </Link>
         </div>
       </div>
@@ -227,7 +227,7 @@ export function PaymentReturn() {
         ) : null}
       </div>
 
-      <h1>Campaign funded</h1>
+      <h1>Validation run funded</h1>
       <p className="pay-sandbox">
         Pinch sandbox transaction — no real money moved
       </p>
@@ -246,7 +246,7 @@ export function PaymentReturn() {
           <dd className="pay-mono">{result?.paymentLinkId}</dd>
         </div>
         <div>
-          <dt>Campaign</dt>
+          <dt>Validation run</dt>
           <dd className="pay-mono">{campaignId}</dd>
         </div>
         <div>
@@ -258,7 +258,7 @@ export function PaymentReturn() {
           <dd>Test</dd>
         </div>
         <div>
-          <dt>Campaign status</dt>
+          <dt>Run status</dt>
           <dd className="pay-live">{(campaignStatus ?? "live").toUpperCase()}</dd>
         </div>
       </dl>

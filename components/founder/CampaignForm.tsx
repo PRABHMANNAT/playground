@@ -118,7 +118,7 @@ export function CampaignForm() {
       if (!response.ok || "error" in payload) {
         const message =
           "error" in payload
-            ? payload.error.message
+            ? payload.error.message.replace(/campaign/gi, "validation run")
             : "Playground could not start the Pinch checkout.";
         // Return the campaign to draft so a retry starts from a clean state.
         await updateCampaignStatus(campaignId, "draft");
@@ -309,7 +309,7 @@ export function CampaignForm() {
             <h3 className="founder-summary__title">Order summary</h3>
             <dl className="founder-summary">
               <div>
-                <dt>Campaign funding</dt>
+                <dt>Run funding</dt>
                 <dd>{formatAud(pricing.campaignFunding)}</dd>
               </div>
               <div>
@@ -379,7 +379,7 @@ export function CampaignForm() {
             >
               {submitting
                 ? "Creating secure Pinch checkout…"
-                : "Fund campaign with Pinch"}
+                : "Fund validation run with Pinch"}
             </button>
 
             <p className="founder-note" aria-live="polite">
@@ -388,7 +388,7 @@ export function CampaignForm() {
                 : "Sandbox transaction. Payment is handled on Pinch's hosted checkout."}
             </p>
             <p className="founder-note founder-note--quiet">
-              Campaign stays in draft until Pinch confirms the payment.{" "}
+              Validation run stays in draft until Pinch confirms the payment.{" "}
               <Link href="/">Back to overview</Link>
             </p>
           </section>

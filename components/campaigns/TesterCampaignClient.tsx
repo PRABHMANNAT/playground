@@ -147,7 +147,7 @@ export function TesterCampaignClient({
   const validate = (): string[] => {
     const nextErrors: string[] = [];
     if (campaignReady !== true) {
-      nextErrors.push("The campaign must be active before evidence is submitted.");
+      nextErrors.push("The validation run must be active before evidence is submitted.");
     }
     if (completedTasks.size !== TASKS.length) {
       nextErrors.push("Complete all four required tasks.");
@@ -209,7 +209,7 @@ export function TesterCampaignClient({
       }
       router.push(`/campaigns/${campaignId}/results`);
     } catch (error) {
-      console.error("Campaign submission failed", error);
+      console.error("Validation run submission failed", error);
       setErrors([
         "The evidence could not be saved in this browser. Check local storage access and try again.",
       ]);
@@ -226,7 +226,7 @@ export function TesterCampaignClient({
           Playground
         </Link>
         <div className="cw-tester-context">
-          <span>Tester mission</span>
+          <span>Tester run</span>
           <strong>92% match</strong>
         </div>
       </header>
@@ -234,10 +234,10 @@ export function TesterCampaignClient({
       <div className="cw-page cw-tester-page">
         <section className="cw-tester-hero">
           <div>
-            <p className="cw-kicker">Campaign {campaignId} · INGEN</p>
+            <p className="cw-kicker">Validation run {campaignId} · INGEN</p>
             <h1>Recruiter onboarding validation</h1>
             <p>
-              Understand the mission, collect focused evidence, and submit one
+              Understand the tasks, collect focused evidence, and submit one
               clear launch recommendation.
             </p>
           </div>
@@ -271,7 +271,7 @@ export function TesterCampaignClient({
           </div>
           <div>
             <dt>Funding</dt>
-            <dd>Campaign funded through Pinch</dd>
+            <dd>Validation run funded through Pinch</dd>
           </div>
           <div>
             <dt>Payment reference</dt>
@@ -282,13 +282,13 @@ export function TesterCampaignClient({
         {campaignReady === false ? (
           <p className="cw-reserved-note cw-reserved-note--blocked" role="alert">
             <span aria-hidden="true">!</span>
-            This campaign is not active. Complete the verified Pinch sandbox
+            This validation run is not active. Complete the verified Pinch sandbox
             payment before submitting evidence.
           </p>
         ) : (
           <p className="cw-reserved-note">
             <span aria-hidden="true">◇</span>
-            Reward is reserved from the funded campaign. Initial tester payouts
+            Reward is reserved from the funded validation run. Initial tester payouts
             are manually reviewed.
           </p>
         )}

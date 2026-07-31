@@ -4,8 +4,8 @@ import { ScoutCampaignClient } from "@/components/campaigns/ScoutCampaignClient"
 import { isBrowserbaseConfigured } from "@/lib/browser/server/browserbase";
 
 export const metadata: Metadata = {
-  title: "Scout campaign",
-  description: "A funded campaign moving from Pinch approval into validation.",
+  title: "Scout validation run",
+  description: "A funded run moving from Pinch approval into validation.",
 };
 
 export const dynamic = "force-dynamic";

@@ -4,7 +4,7 @@ import { CampaignResultsHandoff } from "@/components/campaigns/CampaignResultsHa
 
 export const metadata: Metadata = {
   title: "Evidence received",
-  description: "Campaign evidence saved and awaiting quality review.",
+  description: "Validation run evidence saved and awaiting quality review.",
 };
 
 export default async function CampaignResultsPage({

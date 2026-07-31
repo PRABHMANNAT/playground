@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { DemoControls } from "@/components/campaigns/DemoControls";
+import { RoleNavigation } from "@/components/navigation/RoleNavigation";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,6 +39,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <RoleNavigation />
         <DemoControls />
       </body>
     </html>

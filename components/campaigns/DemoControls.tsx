@@ -25,7 +25,7 @@ export function DemoControls() {
   const reset = async () => {
     if (
       !window.confirm(
-        "Reset campaign cmp_001 to Draft and remove the live demo submission?",
+        "Reset validation run cmp_001 to Draft and remove the live demo submission?",
       )
     ) {
       return;

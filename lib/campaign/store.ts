@@ -306,14 +306,14 @@ export async function updateCampaignStatus(
   await ensureDemoState();
   const campaign = await playgroundDb.campaigns.get(id);
   if (!campaign) {
-    throw new Error(`Campaign ${id} was not found.`);
+    throw new Error(`Validation run ${id} was not found.`);
   }
   if (campaign.status === status) {
     return campaign;
   }
   if (!ALLOWED_TRANSITIONS[campaign.status].includes(status)) {
     throw new Error(
-      `Campaign cannot move from ${campaign.status} to ${status}.`,
+      `Validation run cannot move from ${campaign.status} to ${status}.`,
     );
   }
 
@@ -342,7 +342,7 @@ export async function attachPinchPayment(
   await ensureDemoState();
   const campaign = await playgroundDb.campaigns.get(id);
   if (!campaign) {
-    throw new Error(`Campaign ${id} was not found.`);
+    throw new Error(`Validation run ${id} was not found.`);
   }
 
   const updated: Campaign = {
@@ -367,13 +367,13 @@ export async function saveTesterSubmission(
 
   const campaign = await playgroundDb.campaigns.get(input.campaignId);
   if (!campaign) {
-    throw new Error("Campaign not found.");
+    throw new Error("Validation run not found.");
   }
   if (
     input.sourceType === "live_demo" &&
     !["live", "evidence_pending", "results_ready"].includes(campaign.status)
   ) {
-    throw new Error("The campaign must be live before evidence is submitted.");
+    throw new Error("The validation run must be live before evidence is submitted.");
   }
 
   const submission: TesterSubmission = {
@@ -469,7 +469,7 @@ export async function activateCampaignAfterVerification(
   await ensureDemoState();
   const campaign = await playgroundDb.campaigns.get(id);
   if (!campaign) {
-    return { activated: false, reason: "Campaign not found." };
+    return { activated: false, reason: "Validation run not found." };
   }
   if (
     campaign.status === "live" ||
@@ -481,7 +481,7 @@ export async function activateCampaignAfterVerification(
   if (campaign.status !== "payment_pending") {
     return {
       activated: false,
-      reason: `Campaign is ${campaign.status}, not payment_pending.`,
+      reason: `Validation run is ${campaign.status}, not payment_pending.`,
     };
   }
 

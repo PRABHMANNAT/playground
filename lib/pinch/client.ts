@@ -359,7 +359,7 @@ async function upsertPayer(
     {
       code: "pinch_payer_failed",
       message:
-        "Pinch could not create the payer record for this campaign. Check the founder name and email, then try again.",
+        "Pinch could not create the payer record for this validation run. Check the founder name and email, then try again.",
     },
     { step: "payers.upsert", campaignId },
   );
@@ -439,7 +439,7 @@ export async function createCheckout(
         // Pinch amounts are in cents.
         amount: Math.round(input.amount * 100),
         currency: "AUD",
-        description: "Playground validation campaign",
+        description: "Playground validation run",
         allowedPaymentMethods: ["credit-card"],
         returnUrl: returnUrl.toString(),
         metadata: JSON.stringify({ campaignId: input.campaignId }),
@@ -448,7 +448,7 @@ export async function createCheckout(
     {
       code: "pinch_payment_link_failed",
       message:
-        "Pinch could not create the sandbox checkout for this campaign. Try again in a moment.",
+        "Pinch could not create the sandbox checkout for this validation run. Try again in a moment.",
     },
     { step: "payment-links.create", campaignId: input.campaignId },
   );
@@ -533,7 +533,7 @@ export async function verifyPayment(
       {
         code: "pinch_payment_lookup_failed",
         message:
-          "Pinch could not verify the Payment Link for this campaign. Try again in a moment.",
+          "Pinch could not verify the Payment Link for this validation run. Try again in a moment.",
       },
       { step: "payment-links.get", campaignId },
     ),
