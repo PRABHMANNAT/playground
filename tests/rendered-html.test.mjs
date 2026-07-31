@@ -22,7 +22,8 @@ test("Landing hero scrolls from the local sunset into the Australia ASCII scene"
   assert.match(landing, /PinchPayments/);
   assert.match(landing, /For founding users/);
   assert.match(landing, /landing-hero__reveal/);
-  assert.match(landing, /Scroll to reveal/);
+  assert.doesNotMatch(landing, /Australia-first validation|Scroll to reveal/);
+  assert.doesNotMatch(landing, /landing-horizon-beam|landing-scroll-cue/);
   assert.match(canvas, /getContext\("2d"/);
   assert.match(canvas, /image\.src = "\/ascii-sunset\.webp"/);
   assert.match(
@@ -38,7 +39,7 @@ test("Landing hero scrolls from the local sunset into the Australia ASCII scene"
   assert.doesNotMatch(canvas, /https:\/\/21st\.dev/);
   assert.match(styles, /\.landing-ascii canvas/);
   assert.match(styles, /\.landing-ascii__sticky/);
-  assert.match(styles, /\.landing-scroll-cue/);
+  assert.doesNotMatch(styles, /\.landing-horizon-beam|\.landing-scroll-cue/);
   assert.match(styles, /\.landing-btn--primary[\s\S]*background: #de7356/);
   assert.match(
     styles,

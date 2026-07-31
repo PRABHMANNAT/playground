@@ -21,8 +21,9 @@ export const metadata: Metadata = {
   description:
     "A professional testing workspace for evidence-backed product reviews.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 

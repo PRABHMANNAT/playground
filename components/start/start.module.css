@@ -1,0 +1,352 @@
+.screen {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #0c0504;
+  color: #fff;
+}
+
+.screen::before {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgba(222, 115, 86, 0.34) 0 1.1px,
+    transparent 1.25px
+  );
+  background-position: center;
+  background-size: 10px 10px;
+  content: "";
+  mask-image: radial-gradient(
+    ellipse 60% 72% at 50% 48%,
+    #000 0 28%,
+    rgba(0, 0, 0, 0.72) 52%,
+    transparent 82%
+  );
+  pointer-events: none;
+}
+
+.screen::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: rgba(4, 2, 2, 0.34);
+  content: "";
+  pointer-events: none;
+}
+
+.fork {
+  display: grid;
+  width: 100%;
+  min-height: 100svh;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  transition: filter 180ms ease;
+}
+
+.forkBlurred {
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.rolePanel {
+  display: grid;
+  min-width: 0;
+  min-height: 100svh;
+  place-items: center;
+  padding: clamp(48px, 7vw, 108px);
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.012);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.rolePanel:last-child {
+  border-right: 0;
+}
+
+.fork:has(.rolePanel:hover) .rolePanel:not(:hover) {
+  opacity: 0.5;
+}
+
+.rolePanel:hover,
+.rolePanel:focus-visible {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.rolePanel:focus-visible {
+  outline: 1px solid #de7356;
+  outline-offset: -3px;
+}
+
+.panelContent {
+  display: grid;
+  width: min(430px, 100%);
+}
+
+.eyebrow,
+.meta,
+.continue {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.eyebrow {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+}
+
+.heading {
+  margin-top: 18px;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-size: clamp(38px, 4.6vw, 70px);
+  font-weight: 610;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+}
+
+.subheading {
+  margin-top: 24px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.5;
+}
+
+.meta {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.continue {
+  margin-top: 36px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.entryLayer {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  animation: entry-layer-in 160ms ease both;
+}
+
+.entryPanel {
+  width: min(420px, 100%);
+  min-height: 292px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.24) inset,
+    0 32px 82px -36px rgba(0, 0, 0, 0.96);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  color: #fff;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.entryEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.entryEyebrow > span {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #de7356;
+  box-shadow: 0 0 12px rgba(222, 115, 86, 0.7);
+}
+
+.terminalLine {
+  min-height: 20px;
+  margin: 24px 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 13px;
+  margin-left: 4px;
+  background: rgba(255, 255, 255, 0.76);
+  vertical-align: -2px;
+  animation: cursor-blink 480ms steps(1, end) infinite;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.form label {
+  display: grid;
+  gap: 7px;
+}
+
+.form label > span {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.form input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9px;
+  background: rgba(5, 3, 3, 0.54);
+  color: #fff;
+  caret-color: #de7356;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+}
+
+.form input:focus {
+  border-color: rgba(222, 115, 86, 0.84);
+  box-shadow: 0 0 0 3px rgba(222, 115, 86, 0.12);
+  outline: none;
+}
+
+.form button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 4px;
+  border: 1px solid #c85e45;
+  border-radius: 9px;
+  background: #de7356;
+  color: #241912;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.form button:hover {
+  background: #e88063;
+}
+
+.form small {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 9px;
+  text-align: center;
+}
+
+@keyframes entry-layer-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0.18;
+  }
+}
+
+@supports not (backdrop-filter: blur(16px)) {
+  .entryPanel {
+    background: rgba(18, 14, 13, 0.96);
+  }
+}
+
+@media (max-width: 800px) {
+  .screen {
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .fork {
+    min-height: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, minmax(50dvh, 1fr));
+  }
+
+  .rolePanel {
+    min-height: 50dvh;
+    padding: 34px 28px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  }
+
+  .rolePanel:last-child {
+    border-bottom: 0;
+  }
+
+  .panelContent {
+    width: min(520px, 100%);
+  }
+
+  .heading {
+    font-size: clamp(34px, 10vw, 48px);
+  }
+
+  .subheading {
+    margin-top: 15px;
+  }
+
+  .continue {
+    margin-top: 22px;
+  }
+
+  .entryLayer {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .rolePanel {
+    padding: 30px 24px;
+  }
+
+  .entryPanel {
+    padding: 24px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fork,
+  .rolePanel,
+  .entryLayer,
+  .cursor {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+  }
+}
